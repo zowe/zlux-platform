@@ -1,0 +1,16 @@
+{
+  "name": "zlux-platform",
+  "version": "0.0.0-zlux.version.replacement",
+  "license": "private",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "devDependencies": {
+    "rxjs": "~6.2.2",
+    "rxjs-compat": "~6.2.2"
+  }
+}

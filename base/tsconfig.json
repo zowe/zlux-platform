@@ -1,0 +1,36 @@
+{
+  "compileOnSave": true,
+  "include": [
+    "src/**/*.ts",
+    "../interface/src/index.d.ts",
+    "../interface/src/mvd-hosting.d.ts"
+  ],
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "../dts",
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "module": "es2015",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictNullChecks": true,
+    "target": "es5",
+    "types": [
+      "rxjs",
+      "node",
+      "core-js"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2015",
+      "dom"
+    ]
+  }
+}
