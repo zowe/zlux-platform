@@ -3,9 +3,9 @@
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-
+  
   SPDX-License-Identifier: EPL-2.0
-
+  
   Copyright Contributors to the Zowe Project.
 */
 
@@ -22,7 +22,7 @@ declare namespace ZLUX {
   interface Dispatcher {
     /**
      * This is the interface that is called by the window manager or app manager to tell the
-     * dispatcher about an application (i.e. plugin instance).
+     * dispatcher about an application (i.e. plugin instance).  
      */
     registerPluginInstance(plugin: Plugin, applicationInstanceId: any, isIframe: boolean): void;
     deregisterPluginInstance(plugin: Plugin, applicationInstanceId: any): void;
@@ -337,7 +337,7 @@ declare namespace ZLUX {
   interface IEditorLanguageServer {
     /**
      * Gets the language supported by this server.
-     *
+     * 
      * @returns The name of the language supported by this server
      */
     getSupportedLanguage(): string;
@@ -674,15 +674,14 @@ declare class RocketMVDResources {
   static dispatcher: ZLUX.Dispatcher;
   static logger: ZLUX.Logger;
   static registry: ZLUX.Registry;
-  static NotificationManager;
 }
 
 /*
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-
+  
   SPDX-License-Identifier: EPL-2.0
-
+  
   Copyright Contributors to the Zowe Project.
 */

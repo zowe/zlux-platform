@@ -4,9 +4,9 @@
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-
+  
   SPDX-License-Identifier: EPL-2.0
-
+  
   Copyright Contributors to the Zowe Project.
 */
 
@@ -85,21 +85,15 @@ declare namespace MVDHosting {
   }
 
   export interface NotificationManagerInterface {
-    push(notification: any): void;
-    pop(): any | void;
-    getAll(): any[] | void;
-    getAllByCategory(type: NotificationType): any[] | void;
+    push(notification: Notification): void;
+    pop(): Notification | void;
+    getAll(): Notification[] | void;
+    getAllByCategory(type: MVDHosting.NotificationType): Notification[] | void;
     getCount(): number;
     addMessageHandler(object: NotificationWatcher): void;
   }
 
-  export interface NotificationInterface {
-    getMessage(): String;
-    getTime(): Date;
-    getType(): NotificationType;
-  }
-
-  export interface NotificationWatcherInterface {
+  export interface NotificationWatcher {
     handleMessageAdded(): void;
   }
 }
@@ -110,8 +104,9 @@ declare namespace MVDHosting {
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-
+  
   SPDX-License-Identifier: EPL-2.0
-
+  
   Copyright Contributors to the Zowe Project.
 */
+
