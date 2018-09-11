@@ -666,15 +666,15 @@ declare namespace ZLUX {
 /* We assume the presence of a global require function for acquiring shared libraries */
 declare const require: (identifier: string) => any;
 
-declare var RocketMVD: typeof RocketMVDResources;
+declare var ZoweZLUX: typeof ZoweZLUXResources;
 
-declare class RocketMVDResources {
-  static PluginManager: any;
+declare class ZoweZLUXResources {
+  static pluginManager: any;
   static uriBroker: ZLUX.UriBroker;
   static dispatcher: ZLUX.Dispatcher;
   static logger: ZLUX.Logger;
   static registry: ZLUX.Registry;
-  static NotificationManager: any;
+  static notificationManager: any;
 }
 
 /*
