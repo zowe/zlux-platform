@@ -669,11 +669,13 @@ declare const require: (identifier: string) => any;
 declare var ZoweZLUX: typeof ZoweZLUXResources;
 
 declare class ZoweZLUXResources {
+  //previously was PluginManager
   static pluginManager: any;
   static uriBroker: ZLUX.UriBroker;
   static dispatcher: ZLUX.Dispatcher;
   static logger: ZLUX.Logger;
   static registry: ZLUX.Registry;
+  //previously was NotificationManager
   static notificationManager: any;
 }
 
