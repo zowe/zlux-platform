@@ -413,7 +413,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
   }
 
   getActionTarget(action:Action, eventContext: any):Promise<ApplicationInstanceWrapper>{
-    let plugin:ZLUX.Plugin|undefined = RocketMVD.PluginManager.getPlugin(action.targetPluginID);
+    let plugin:ZLUX.Plugin|undefined = ZoweZLUX.pluginManager.getPlugin(action.targetPluginID);
     let applicationInstanceId:MVDHosting.InstanceId|undefined = eventContext.applicationInstanceId;
     if (plugin){
       this.log.debug(" ectxt="+eventContext);

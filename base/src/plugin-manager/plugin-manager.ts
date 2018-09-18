@@ -66,7 +66,7 @@ export class PluginManager {
           }
         }
       };
-      request.open("GET", RocketMVD.uriBroker.pluginListUri(pluginType), true);
+      request.open("GET", ZoweZLUX.uriBroker.pluginListUri(pluginType), true);
       request.send();
     });
   }
