@@ -55,7 +55,8 @@ declare namespace MVDHosting {
     setEmbeddedInstanceInput(embeddedInstance: MVDHosting.EmbeddedInstance, input: string, value: any): void;
     getEmbeddedInstanceOutput(embeddedInstance: MVDHosting.EmbeddedInstance, output: string): Observable<any>|undefined;
     killApplication(plugin:ZLUX.Plugin, appId:MVDHosting.InstanceId):void;
-    showApplicationWindow(plugin: DesktopPluginDefinition): void;
+    showApplicationWindow(plugin: DesktopPluginDefinition): Promise<MVDHosting.InstanceId>;
+//must be same exact pointer, otherwise return = false, not found.
     isApplicationRunning(plugin: DesktopPluginDefinition): boolean;
   }
 

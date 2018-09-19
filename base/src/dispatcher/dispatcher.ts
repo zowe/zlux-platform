@@ -59,6 +59,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
    actionsByID :Map<string,Action> = new Map();
    indexedRecognizers :Map<String,RecognizerIndex> = new Map();
    launchCallback: any = null;
+   private pluginWatchers: Map<String,Array<ZLUX.PluginWatcher>> = new Map();
    postMessageCallback: any = null;
    public readonly constants:DispatcherConstants = new DispatcherConstants();
    private log:ZLUX.ComponentLogger;
@@ -107,9 +108,10 @@ export class Dispatcher implements ZLUX.Dispatcher {
     window.setTimeout(dispatcherHeartbeatFunction,Dispatcher.dispatcherHeartbeatInterval);
    }
 
-   deregisterPluginInstance(plugin: ZLUX.Plugin, applicationInstanceId: any):void {
+   deregisterPluginInstance(plugin: ZLUX.Plugin, applicationInstanceId: MVDHosting.InstanceId):void {
      this.log.info(`Dispatcher requested to deregister plugin ${plugin} with id ${applicationInstanceId}`);
-     let instancesArray = this.instancesForTypes.get(plugin.getKey());
+     let key = plugin.getKey();
+     let instancesArray = this.instancesForTypes.get(key);
      if (!instancesArray) {
        this.log.warn("Couldn't deregister instance for plugin ${plugin} because no instances were found");
      } else {
@@ -117,6 +119,12 @@ export class Dispatcher implements ZLUX.Dispatcher {
          if (instancesArray[i].applicationInstanceId === applicationInstanceId) {
            instancesArray.splice(i,1);
            this.log.debug(`Deregistered application instance with id ${applicationInstanceId} from plugin ${plugin} successfully`);
+           let watchers = this.pluginWatchers.get(key);
+           if (watchers) {
+             for (let j = 0; j < watchers.length; j++) {
+               watchers[j].instanceRemoved(applicationInstanceId);
+             }
+           }
            return;
          }
        }
@@ -124,7 +132,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
      }
    }
 
-   registerPluginInstance(plugin: ZLUX.Plugin, applicationInstanceId: any, isIframe:boolean): void {
+   registerPluginInstance(plugin: ZLUX.Plugin, applicationInstanceId: MVDHosting.InstanceId, isIframe:boolean, isEmbedded?:boolean): void {
      this.log.info("Registering plugin="+plugin+" id="+applicationInstanceId);
      let instanceWrapper = new ApplicationInstanceWrapper(applicationInstanceId,isIframe);
      let key = plugin.getKey();
@@ -133,6 +141,12 @@ export class Dispatcher implements ZLUX.Dispatcher {
      } else {
        let ids:any[] = (this.instancesForTypes.get(key) as any[]);
        ids.push(instanceWrapper);
+     }
+     let watchers = this.pluginWatchers.get(key);
+     if (watchers) {
+       for (let i = 0; i < watchers.length; i++) {
+         watchers[i].instanceAdded(applicationInstanceId, isEmbedded);
+       }
      }
      // Michael - how to get window manager, IE, how to get interface to look up plugins,
      // or be called on plugin instance lifecycle stuff.
@@ -262,6 +276,33 @@ export class Dispatcher implements ZLUX.Dispatcher {
        }
      }
    }
+
+  registerPluginWatcher(plugin:ZLUX.Plugin, watcher: ZLUX.PluginWatcher) {
+    let key = plugin.getKey();
+    let watchers = this.pluginWatchers.get(key);
+    if (!watchers) {
+      watchers = new Array<ZLUX.PluginWatcher>();
+      this.pluginWatchers.set(key,watchers);
+    }
+    watchers.push(watcher);
+  }
+
+  deregisterPluginWatcher(plugin:ZLUX.Plugin, watcher: ZLUX.PluginWatcher): boolean {
+    let key = plugin.getKey();
+    let watchers = this.pluginWatchers.get(key);
+    if (!watchers) {
+      return false;
+    }
+    else {
+      for (let i = 0; i < watchers.length; i++) {
+        if (watchers[i] == watcher) {
+          watchers.splice(i,1);
+          return true;
+        }
+      }
+      return false;
+    }
+  }
     
 
 /* what will callback be called with */
