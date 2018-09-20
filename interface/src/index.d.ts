@@ -682,6 +682,7 @@ declare class ZoweZLUXResources {
   static registry: ZLUX.Registry;
   //previously was NotificationManager
   static notificationManager: any;
+  static globalization: ZLUX.Globalization;
 }
 
 /*
