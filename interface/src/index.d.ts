@@ -108,6 +108,11 @@ declare namespace ZLUX {
     setLogLevelForComponentName(componentName: string, level: number): void;
   }
 
+  interface Globalization {
+    getLanguage(): string;
+    getLocale(): string;
+  }
+
   /**
      An interface which allows an App easy access to URIs specific to its own namespace
      @interface
@@ -677,6 +682,7 @@ declare class ZoweZLUXResources {
   static registry: ZLUX.Registry;
   //previously was NotificationManager
   static notificationManager: any;
+  static globalization: ZLUX.Globalization;
 }
 
 /*
