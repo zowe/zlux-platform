@@ -156,6 +156,7 @@ declare namespace ZLUX {
     getVersion():string;
     getWebContent():any;
     getType():PluginType;
+    getCopyright():string;
   }
 
   interface ContainerPluginDefinition {
