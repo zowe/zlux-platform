@@ -55,11 +55,9 @@ declare namespace MVDHosting {
     spawnApplicationWithTarget(plugin: DesktopPluginDefinition, launchMetadata: any, viewportId: MVDHosting.ViewportId): Promise<MVDHosting.InstanceId>;
     setEmbeddedInstanceInput(embeddedInstance: MVDHosting.EmbeddedInstance, input: string, value: any): void;
     getEmbeddedInstanceOutput(embeddedInstance: MVDHosting.EmbeddedInstance, output: string): Observable<any>|undefined;
-    killApplication(plugin:ZLUX.Plugin, appId:MVDHosting.InstanceId,windowID:number):void;
+    killApplication(plugin:ZLUX.Plugin, appId:MVDHosting.InstanceId):void;
     showApplicationWindow(plugin: DesktopPluginDefinition): void;
-    showApplicationPropertiesWindow(plugin: DesktopPluginDefinition): void;
     isApplicationRunning(plugin: DesktopPluginDefinition): boolean;
-    getAppWindowID(pluginID:string): number| null;
   }
 
   export interface PluginManagerInterface {
