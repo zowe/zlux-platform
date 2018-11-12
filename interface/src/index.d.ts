@@ -140,8 +140,10 @@ declare namespace ZLUX {
      */
     pluginConfigForGroupUri(pluginDefinition: ZLUX.Plugin, group: string, resourcePath: string, resourceName?: string): string;
     pluginConfigUri(pluginDefinition: ZLUX.Plugin, resourcePath: string, resourceName?: string): string;
-    pluginWSUri(pluginDefinition: Plugin, serviceName: string, relativePath: string): string;
-    pluginRESTUri(pluginDefinition: Plugin, serviceName: string, relativePath: string): string;
+    pluginWSUri(pluginDefinition: Plugin, serviceName: string, 
+        relativePath: string, version?: string): string;
+    pluginRESTUri(pluginDefinition: Plugin, serviceName: string, 
+        relativePath: string, version?: string): string;
   }
 
   const enum PluginType {
