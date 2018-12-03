@@ -131,14 +131,16 @@ declare namespace ZLUX {
     pluginConfigForScopeUri(pluginDefinition: ZLUX.Plugin, scope: string, resourcePath: string, resourceName?: string): string;
     /**
        Returns a URI for accessing a resource for a particular user. NOTE: This command should be gated by authorization that restricts it to administrative use.
+       Temporarily removed until authorization checks are in place
        @function
      */
-    pluginConfigForUserUri(pluginDefinition: ZLUX.Plugin, user: string, resourcePath: string, resourceName?: string): string;
+    //pluginConfigForUserUri(pluginDefinition: ZLUX.Plugin, user: string, resourcePath: string, resourceName?: string): string;
     /**
        Returns a URI for accessing a resource for a particular group. NOTE: This command should be gated by authorization that restricts it to administrative use.
+       Temporarily removed until authorization checks are in place
        @function
      */
-    pluginConfigForGroupUri(pluginDefinition: ZLUX.Plugin, group: string, resourcePath: string, resourceName?: string): string;
+    //pluginConfigForGroupUri(pluginDefinition: ZLUX.Plugin, group: string, resourcePath: string, resourceName?: string): string;
     pluginConfigUri(pluginDefinition: ZLUX.Plugin, resourcePath: string, resourceName?: string): string;
     pluginWSUri(pluginDefinition: Plugin, serviceName: string, relativePath: string): string;
     pluginRESTUri(pluginDefinition: Plugin, serviceName: string, relativePath: string): string;

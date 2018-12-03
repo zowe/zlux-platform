@@ -23,6 +23,8 @@ declare namespace MVDWindowManagement {
     getViewportId(windowId: MVDWindowManagement.WindowId): MVDHosting.ViewportId ;
     getWindow(plugin: MVDHosting.DesktopPluginDefinition): MVDWindowManagement.WindowId | null;
     showWindow(windowId: MVDWindowManagement.WindowId): void;
+    closeWindow(windowId: MVDWindowManagement.WindowId): void;
+    closeAllWindows():void;
   }
 }
 
