@@ -59,6 +59,7 @@ declare namespace MVDHosting {
     showApplicationWindow(plugin: DesktopPluginDefinition): Promise<MVDHosting.InstanceId>;
 //must be same exact pointer, otherwise return = false, not found.
     isApplicationRunning(plugin: DesktopPluginDefinition): boolean;
+    getViewportComponentRef(viewportId: MVDHosting.ViewportId): ComponentRef<any> | null;
   }
 
   export interface PluginManagerInterface {
