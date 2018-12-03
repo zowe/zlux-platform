@@ -150,16 +150,17 @@ declare namespace ZLUX {
   }
 
   interface Plugin {
-    getKey():string;
-    getIdentifier():string;
-    getVersion():string;
-    getWebContent():any;
-    getType():PluginType;
+    getKey(): string;
+    getIdentifier(): string;
+    getVersion(): string;
+    getWebContent(): any;
+    getType(): PluginType;
     getCopyright(): string;
+    hasComponents(): boolean;
   }
 
   interface ContainerPluginDefinition {
-    getBasePlugin():Plugin;
+    getBasePlugin(): Plugin;
   }
 
   /**
