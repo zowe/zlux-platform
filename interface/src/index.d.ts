@@ -111,6 +111,11 @@ declare namespace ZLUX {
     setLogLevelForComponentName(componentName: string, level: number): void;
   }
 
+  interface Globalization {
+    getLanguage(): string;
+    getLocale(): string;
+  }
+
   /**
      An interface which allows an App easy access to URIs specific to its own namespace
      @interface
@@ -121,8 +126,7 @@ declare namespace ZLUX {
     datasetMetadataUri(dsn: string, detail?: string, types?: string, listMembers?: boolean, workAreaSize?: number, includeMigrated?: boolean, includeUnprintable?: boolean, resumeName?: string, resumeCatalogName?: string): string;
     datasetContentsUri(dsn: string): string;
     VSAMdatasetContentsUri(dsn: string, closeAfter?: boolean): string;
-    unixFileMetadataUri(path: string): string;
-    unixFileContentsUri(path: string): string;
+    unixFileUri(route: string, absPath: string, sourceEncoding?: string | undefined, targetEncoding?: string | undefined, newName?: string | undefined, forceOverwrite?: boolean | undefined): string;
     rasUri(uri: string): string;
     serverRootUri(uri: string): string;
     pluginResourceUri(pluginDefinition: Plugin, relativePath: string): string;
@@ -130,14 +134,16 @@ declare namespace ZLUX {
     pluginConfigForScopeUri(pluginDefinition: ZLUX.Plugin, scope: string, resourcePath: string, resourceName?: string): string;
     /**
        Returns a URI for accessing a resource for a particular user. NOTE: This command should be gated by authorization that restricts it to administrative use.
+       Temporarily removed until authorization checks are in place
        @function
      */
-    pluginConfigForUserUri(pluginDefinition: ZLUX.Plugin, user: string, resourcePath: string, resourceName?: string): string;
+    //pluginConfigForUserUri(pluginDefinition: ZLUX.Plugin, user: string, resourcePath: string, resourceName?: string): string;
     /**
        Returns a URI for accessing a resource for a particular group. NOTE: This command should be gated by authorization that restricts it to administrative use.
+       Temporarily removed until authorization checks are in place
        @function
      */
-    pluginConfigForGroupUri(pluginDefinition: ZLUX.Plugin, group: string, resourcePath: string, resourceName?: string): string;
+    //pluginConfigForGroupUri(pluginDefinition: ZLUX.Plugin, group: string, resourcePath: string, resourceName?: string): string;
     pluginConfigUri(pluginDefinition: ZLUX.Plugin, resourcePath: string, resourceName?: string): string;
     pluginWSUri(pluginDefinition: Plugin, serviceName: string, relativePath: string): string;
     pluginRESTUri(pluginDefinition: Plugin, serviceName: string, relativePath: string): string;
@@ -160,6 +166,7 @@ declare namespace ZLUX {
     getVersion():string;
     getWebContent():any;
     getType():PluginType;
+    getCopyright(): string;
   }
 
   interface ContainerPluginDefinition {
@@ -678,12 +685,15 @@ declare const require: (identifier: string) => any;
 declare var ZoweZLUX: typeof ZoweZLUXResources;
 
 declare class ZoweZLUXResources {
+  //previously was PluginManager
   static pluginManager: any;
   static uriBroker: ZLUX.UriBroker;
   static dispatcher: ZLUX.Dispatcher;
   static logger: ZLUX.Logger;
   static registry: ZLUX.Registry;
+  //previously was NotificationManager
   static notificationManager: any;
+  static globalization: ZLUX.Globalization;
 }
 
 /*

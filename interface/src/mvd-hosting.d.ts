@@ -39,6 +39,7 @@ declare namespace MVDHosting {
   export interface DesktopPluginDefinition extends ZLUX.ContainerPluginDefinition {
     getIdentifier(): string;
     getFramework(): string;
+    getCopyright(): string;
   }
 
   export interface ViewportManagerInterface {
