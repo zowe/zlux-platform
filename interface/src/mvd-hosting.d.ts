@@ -40,6 +40,7 @@ declare namespace MVDHosting {
     getIdentifier(): string;
     getFramework(): string;
     getCopyright(): string;
+    hasComponents(): boolean;
   }
 
   export interface ViewportManagerInterface {
