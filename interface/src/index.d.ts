@@ -99,6 +99,7 @@ declare namespace ZLUX {
     log(minimumLevel: number, ...loggableItems:any[]): void;
     info(...loggableItems:any[]): void;
     warn(...loggableItems:any[]): void;
+    severe(...loggableItems:any[]): void;    
     debug(...loggableItems:any[]): void;
     makeSublogger(componentNameSuffix: string): ComponentLogger;
   }
