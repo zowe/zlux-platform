@@ -96,11 +96,11 @@ declare namespace ZLUX {
   }
 
   interface ComponentLogger {
-    log(minimumLevel: number, message: string): void;
-    info(message: string): void;
-    warn(message: string): void;
-    severe(message: string): void;    
-    debug(message: string): void;
+    log(minimumLevel: number, ...loggableItems:any[]): void;
+    info(...loggableItems:any[]): void;
+    warn(...loggableItems:any[]): void;
+    severe(...loggableItems:any[]): void;    
+    debug(...loggableItems:any[]): void;
     makeSublogger(componentNameSuffix: string): ComponentLogger;
   }
 
