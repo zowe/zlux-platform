@@ -124,7 +124,9 @@ declare namespace ZLUX {
     datasetMetadataUri(dsn: string, detail?: string, types?: string, listMembers?: boolean, workAreaSize?: number, includeMigrated?: boolean, includeUnprintable?: boolean, resumeName?: string, resumeCatalogName?: string): string;
     datasetContentsUri(dsn: string): string;
     VSAMdatasetContentsUri(dsn: string, closeAfter?: boolean): string;
-    unixFileUri(route: string, absPath: string, sourceEncoding?: string | undefined, targetEncoding?: string | undefined, newName?: string | undefined, forceOverwrite?: boolean | undefined): string;
+    unixFileUri(route: string, absPath: string, sourceEncoding?: string | undefined, targetEncoding?: string | undefined, 
+                 newName?: string | undefined, forceOverwrite?: boolean | undefined, sessionID?: number | undefined, 
+                 lastChunk?: boolean | undefined): string;
     rasUri(uri: string): string;
     serverRootUri(uri: string): string;
     pluginResourceUri(pluginDefinition: Plugin, relativePath: string): string;
