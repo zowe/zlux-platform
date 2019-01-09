@@ -24,7 +24,10 @@ declare namespace ZLUX {
      * This is the interface that is called by the window manager or app manager to tell the
      * dispatcher about an application (i.e. plugin instance).
      */
-    registerPluginInstance(plugin: Plugin, applicationInstanceId: any, isIframe: boolean): void;
+    registerPluginWatcher(plugin:ZLUX.Plugin, watcher: PluginWatcher): void;
+    //only removes watcher when same exact object
+    deregisterPluginWatcher(plugin:ZLUX.Plugin, watcher: PluginWatcher): boolean; 
+    registerPluginInstance(plugin: Plugin, applicationInstanceId: any, isIframe: boolean, isEmbedded?:boolean): void;
     deregisterPluginInstance(plugin: Plugin, applicationInstanceId: any): void;
     setLaunchHandler(launchCallback: any): void;
     setPostMessageHandler(postMessageCallback: any): void;
@@ -149,6 +152,12 @@ declare namespace ZLUX {
         relativePath: string, version?: string): string;
     pluginRESTUri(pluginDefinition: Plugin, serviceName: string, 
         relativePath: string, version?: string): string;
+  }
+
+  
+  interface PluginWatcher {
+    instanceAdded(instanceId: MVDHosting.InstanceId, isEmbedded: boolean|undefined): void;
+    instanceRemoved(instanceId: MVDHosting.InstanceId): void;
   }
 
   const enum PluginType {
