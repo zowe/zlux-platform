@@ -80,7 +80,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
 
    static dispatcherHeartbeatInterval:number = 60000; /* one minute */
 
-   clearDispatcher(): void {
+   clear(): void {
     this.instancesForTypes.clear();
     this.indexedRecognizers.clear();
     this.recognizers = [];

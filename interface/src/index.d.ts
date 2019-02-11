@@ -39,7 +39,7 @@ declare namespace ZLUX {
     invokeAction(action: Action, eventContext: any): any;
     makeAction(id: string, defaultName: string, targetMode: ActionTargetMode, type: ActionType, targetPluginID: string, primaryArgument: any): Action;
     registerApplicationCallbacks(plugin: Plugin, applicationInstanceId: any, callbacks: ApplicationCallbacks): void;
-    clearDispatcher(): void;
+    clear(): void;
     constants: DispatcherConstants;
   }
 
