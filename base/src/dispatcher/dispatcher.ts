@@ -55,9 +55,9 @@ export class DispatcherConstants implements ZLUX.DispatcherConstants {
 
 export class Dispatcher implements ZLUX.Dispatcher {
    private instancesForTypes : Map<string,ApplicationInstanceWrapper[]> = new Map();
-   recognizers:RecognitionRule[] = [];
-   actionsByID :Map<string,Action> = new Map();
-   indexedRecognizers :Map<String,RecognizerIndex> = new Map();
+   private recognizers:RecognitionRule[] = [];
+   private actionsByID :Map<string,Action> = new Map();
+   private indexedRecognizers :Map<String,RecognizerIndex> = new Map();
    launchCallback: any = null;
    private pluginWatchers: Map<String,Array<ZLUX.PluginWatcher>> = new Map();
    postMessageCallback: any = null;
@@ -80,10 +80,19 @@ export class Dispatcher implements ZLUX.Dispatcher {
 
    static dispatcherHeartbeatInterval:number = 60000; /* one minute */
 
+   clear(): void {
+    this.instancesForTypes.clear();
+    this.indexedRecognizers.clear();
+    this.recognizers = [];
+    this.actionsByID.clear();
+   }
+
    runHeartbeat():void {
      let dispatcherHeartbeatFunction = () => {
+     this.log.debug('Recognizers: ', this.recognizers);
      this.log.debug("dispatcher heart beat");
-     this.log.debug("instances for Types = "+this.instancesForTypes.toString());
+     this.log.debug("instances for Types = ", this.instancesForTypes);
+     this.log.debug("indexed recognizers = ", this.indexedRecognizers);
      let keyIterator:Iterator<string> = this.instancesForTypes.keys();
      while (true){
        let iterationValue = keyIterator.next();
@@ -616,7 +625,7 @@ export enum ActionType {       // not all actions are meaningful for all target 
   Maximize,
   Close,                       // may need to call a "close handler"
 } 
-
+  
 
 export class Action implements ZLUX.Action {
     id: string;           // id of action itself.
