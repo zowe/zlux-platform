@@ -47,14 +47,9 @@ declare namespace MVDHosting {
     createViewport(providersProvider: any): MVDHosting.ViewportId;
     registerViewport(viewportId: MVDHosting.ViewportId, instanceId: MVDHosting.InstanceId): void;
     destroyViewport(viewportId: MVDHosting.ViewportId): Promise<void>;
-    registerViewportCloseHandler(viewportId: MVDHosting.InstanceId, watcher: MVDHosting.ViewportCloseHandler): void;
+    registerViewportCloseHandler(viewportId: MVDHosting.InstanceId, watcher: () => Promise<any>): void;
     getApplicationInstanceId(viewportId: MVDHosting.ViewportId): MVDHosting.InstanceId | null;
   }
-
-  export interface ViewportCloseHandler {
-    onViewportClosed(): Promise<any>;
-  }
-
 
   export interface ApplicationManagerInterface {
     spawnApplication(plugin: DesktopPluginDefinition, launchMetadata: any): Promise<MVDHosting.InstanceId>;
