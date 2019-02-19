@@ -52,7 +52,7 @@ declare namespace MVDHosting {
   }
 
   export interface ViewportCloseHandler {
-    onViewportClosed(): Promise<void>;
+    onViewportClosed(): Promise<any>;
   }
 
 
