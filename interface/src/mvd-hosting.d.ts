@@ -44,9 +44,10 @@ declare namespace MVDHosting {
   }
 
   export interface ViewportManagerInterface {
-    createViewport(providers: Map<string, any>): MVDHosting.ViewportId;
+    createViewport(providersProvider: any): MVDHosting.ViewportId;
     registerViewport(viewportId: MVDHosting.ViewportId, instanceId: MVDHosting.InstanceId): void;
-    destroyViewport(viewportId: MVDHosting.ViewportId): void;
+    destroyViewport(viewportId: MVDHosting.ViewportId): Promise<void>;
+    registerViewportCloseHandler(viewportId: MVDHosting.InstanceId, watcher: () => Promise<any>): void;
     getApplicationInstanceId(viewportId: MVDHosting.ViewportId): MVDHosting.InstanceId | null;
   }
 
