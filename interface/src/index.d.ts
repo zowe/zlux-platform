@@ -118,6 +118,16 @@ declare namespace ZLUX {
     getLocale(): string;
   }
 
+  type UnixFileUriOptions = {
+    sourceEncoding?: string,
+    targetEncoding?: string,
+    newName?: string,
+    forceOverwrite?: boolean,
+    sessionID?: number,
+    lastChunk?: boolean,
+    responseType?: string
+  }
+
   /**
      An interface which allows an App easy access to URIs specific to its own namespace
      @interface
@@ -128,9 +138,14 @@ declare namespace ZLUX {
     datasetMetadataUri(dsn: string, detail?: string, types?: string, listMembers?: boolean, workAreaSize?: number, includeMigrated?: boolean, includeUnprintable?: boolean, resumeName?: string, resumeCatalogName?: string): string;
     datasetContentsUri(dsn: string): string;
     VSAMdatasetContentsUri(dsn: string, closeAfter?: boolean): string;
-    unixFileUri(route: string, absPath: string, sourceEncoding?: string | undefined, targetEncoding?: string | undefined, 
-                 newName?: string | undefined, forceOverwrite?: boolean | undefined, sessionID?: number | undefined, 
-                 lastChunk?: boolean | undefined): string;
+    /*TODO: for breaking change, we need to change this into a passed object so that its way cleaner and
+            more clear as to what is going on
+    */
+    unixFileUri(route: string, absPath: string,
+                sourceEncodingOrOptions?: string | UnixFileUriOptions | undefined,
+                targetEncoding?: string | undefined, newName?: string | undefined,
+                forceOverwrite?: boolean | undefined, sessionID?: number | undefined, 
+                 lastChunk?: boolean | undefined, responseType?: string): string;
     rasUri(uri: string): string;
     serverRootUri(uri: string): string;
     pluginResourceUri(pluginDefinition: Plugin, relativePath: string): string;
