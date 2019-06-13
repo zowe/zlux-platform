@@ -22,6 +22,8 @@
 
 // <reference types="ZLUX" />
 
+const IFRAME_LOAD_TIMEOUT = 180000; //3 minutes
+
 export class RecognizerIndex {
    propertyName:string;
    valueMap:Map<any,RecognitionRule[]> = new Map();
@@ -53,7 +55,15 @@ export class DispatcherConstants implements ZLUX.DispatcherConstants {
   readonly ActionType = ActionType;
 }
 
+class IframeContext {
+  constructor(
+    public readonly timestamp: number,
+    public readonly data: any
+  ){}
+}
+
 export class Dispatcher implements ZLUX.Dispatcher {
+   private pendingIframes: Map<string,IframeContext[]> = new Map();
    private instancesForTypes : Map<string,ApplicationInstanceWrapper[]> = new Map();
    private recognizers:RecognitionRule[] = [];
    private actionsByID :Map<string,Action> = new Map();
@@ -99,14 +109,16 @@ export class Dispatcher implements ZLUX.Dispatcher {
        if (iterationValue.done) break;
        let key = iterationValue.value;
        let wrappers:ApplicationInstanceWrapper[]|undefined = this.instancesForTypes.get(key);
-       this.log.debug("disp.heartbeat: key "+JSON.stringify(key)+" val="+wrappers);
+       this.log.debug("disp.heartbeat: key "+JSON.stringify(key)+" val=",wrappers);
        if (wrappers){
          for (let wrapper of (wrappers as ApplicationInstanceWrapper[])){
-           this.log.debug("wrapper="+wrapper);
-           this.postMessageCallback(wrapper.applicationInstanceId,
-            { dispatchType: "echo",
-              dispatchData:  { a: 1 }
-            });
+           this.log.debug("wrapper=",wrapper);
+           if (wrapper.isIframe && this.postMessageCallback) {
+             this.postMessageCallback(wrapper.applicationInstanceId,
+              { dispatchType: "echo",
+                dispatchData:  { a: 1 }
+              });
+           }
          }
        }
       
@@ -116,6 +128,20 @@ export class Dispatcher implements ZLUX.Dispatcher {
     };
     window.setTimeout(dispatcherHeartbeatFunction,Dispatcher.dispatcherHeartbeatInterval);
    }
+
+  iframeLoaded(instanceId: MVDHosting.InstanceId, identifier: string):void {
+    this.log.debug(`Dequeuing iframe data`);
+    if (this.postMessageCallback) {
+      const contexts = this.pendingIframes.get(identifier);
+      if (contexts && contexts.length > 0) {
+        let context = contexts.shift();
+        if (context) {
+          this.log.debug(`Sending postmessage of type launch to ${identifier} instance=${instanceId}`,context.data);
+          this.postMessageCallback(instanceId,{dispatchType: 'launch', dispatchData: {launchMetadata: context.data}});
+        }
+      }
+    }
+   }   
 
    deregisterPluginInstance(plugin: ZLUX.Plugin, applicationInstanceId: MVDHosting.InstanceId):void {
      this.log.info(`Dispatcher requested to deregister plugin ${plugin} with id ${applicationInstanceId}`);
@@ -448,6 +474,29 @@ export class Dispatcher implements ZLUX.Dispatcher {
       return Promise.reject("no launch callback established");
     }
     let launchMetadata = this.buildObjectFromTemplate(action.primaryArgument, eventContext);
+    if (this.postMessageCallback && plugin.getWebContent().framework === 'iframe') {
+      let contexts = this.pendingIframes.get(plugin.getIdentifier());
+      if (!contexts) {
+        contexts = [];
+        this.pendingIframes.set(plugin.getIdentifier(), contexts);
+      }
+      contexts.push(new IframeContext(Date.now()+IFRAME_LOAD_TIMEOUT, launchMetadata));
+      setTimeout(()=> {
+        if (contexts) {
+          let now = Date.now();
+          for (let i = 0; i < contexts.length; i++) {
+            if (contexts[i].timestamp > now) {
+              if (i > 0) {
+                contexts.splice(0,i);
+              }
+              return;
+            }
+          }
+          //clear
+          this.pendingIframes.set(plugin.getIdentifier(),[]);
+        }
+      },IFRAME_LOAD_TIMEOUT+1);
+    }
     let appPromise = 
       this.launchCallback(plugin, launchMetadata).then( (newAppID:MVDHosting.InstanceId) => {
         let wrapper = this.getAppInstanceWrapper(plugin,newAppID);
@@ -506,8 +555,14 @@ export class Dispatcher implements ZLUX.Dispatcher {
         break;
       case ActionType.Message:
         this.log.debug('Invoking message type Action');
+        //TODO is eventContext here different from this.buildObjectFromTemplate(action.primaryArgument, eventContext);
         if (wrapper.callbacks && wrapper.callbacks.onMessage) {
           wrapper.callbacks.onMessage(eventContext);
+        } else if (this.postMessageCallback && wrapper.isIframe) {
+          this.postMessageCallback(wrapper.applicationInstanceId,
+                                   { dispatchType: 'message',
+                                     dispatchData: eventContext
+                                   });
         }
         break;
       case ActionType.Minimize:

@@ -40,6 +40,7 @@ declare namespace ZLUX {
     makeAction(id: string, defaultName: string, targetMode: ActionTargetMode, type: ActionType, targetPluginID: string, primaryArgument: any): Action;
     registerApplicationCallbacks(plugin: Plugin, applicationInstanceId: any, callbacks: ApplicationCallbacks): void;
     clear(): void;
+    iframeLoaded(instanceId: MVDHosting.InstanceId, identifier: string);
     constants: DispatcherConstants;
   }
 
