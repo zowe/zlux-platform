@@ -560,7 +560,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
     this.log.info("dispatcher.invokeAction on context "+JSON.stringify(eventContext));
     this.getActionTarget(action,eventContext).then( (target: ActionTarget) => {
       const wrapper = target.wrapper; 
-      var  targetId = eventContext.data.target || this.windowManager.nextId - 1;
+      var  targetId = eventContext.data.target || this.windowManager.nextId() - 1;
       switch (action.type) {
       case ActionType.Launch:
         if (!target.preexisting) {
@@ -581,6 +581,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
       case ActionType.Minimize:
           this.log.debug("invoke Launch, which means do nothing if wrapper found: "+wrapper);
           this.windowManager.minimize(targetId);
+          console.log(targetId);
           break;
       case ActionType.Maximize:
          this.log.debug("invoke Launch, which means do nothing if wrapper found: "+wrapper);
