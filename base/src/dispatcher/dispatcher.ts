@@ -22,6 +22,7 @@
 
 // <reference types="ZLUX" />
 
+
 const IFRAME_LOAD_TIMEOUT = 180000; //3 minutes
 
 class ActionTarget {
@@ -79,8 +80,10 @@ export class Dispatcher implements ZLUX.Dispatcher {
    postMessageCallback: any = null;
    public readonly constants:DispatcherConstants = new DispatcherConstants();
    private log:ZLUX.ComponentLogger;
-  
-  constructor(logger: ZLUX.Logger){
+   private windowManager: any;
+  constructor(
+    logger: ZLUX.Logger,
+  ){
      /* dispatcher created early on - refering to logger from window object as a result */
      this.log = logger.makeComponentLogger("ZLUX.Dispatcher");
      this.runHeartbeat();
@@ -176,6 +179,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
    registerPluginInstance(plugin: ZLUX.Plugin, applicationInstanceId: MVDHosting.InstanceId, isIframe:boolean, isEmbedded?:boolean): void {
      this.log.info("Registering plugin="+plugin+" id="+applicationInstanceId);
      let instanceWrapper = new ApplicationInstanceWrapper(applicationInstanceId,isIframe);
+
      let key = plugin.getKey();
      if (!this.instancesForTypes.get(key)){
        this.instancesForTypes.set(key,[instanceWrapper]);
@@ -555,11 +559,11 @@ export class Dispatcher implements ZLUX.Dispatcher {
   invokeAction(action:Action, eventContext: any):any{
     this.log.info("dispatcher.invokeAction on context "+JSON.stringify(eventContext));
     this.getActionTarget(action,eventContext).then( (target: ActionTarget) => {
-      const wrapper = target.wrapper;
+      const wrapper = target.wrapper; 
+      var  targetId = eventContext.data.target || this.windowManager.nextId - 1;
       switch (action.type) {
       case ActionType.Launch:
         if (!target.preexisting) {
-          this.log.debug("invoke Launch, which means do nothing if wrapper found: "+wrapper);
           break;
         } //else fall-through
       case ActionType.Message:
@@ -575,14 +579,23 @@ export class Dispatcher implements ZLUX.Dispatcher {
         }
         break;
       case ActionType.Minimize:
+          this.log.debug("invoke Launch, which means do nothing if wrapper found: "+wrapper);
+          this.windowManager.minimize(targetId);
+          break;
       case ActionType.Maximize:
+         this.log.debug("invoke Launch, which means do nothing if wrapper found: "+wrapper);
+         this.windowManager.maximize(targetId);
         this.log.warn('Max/Min not supported at this time. Concern if apps should be able to control other apps visibility.');
+          break;
       default:
         this.log.warn("Unhandled action type = "+action.type);
       };
     });
   }
 
+  setWindowManager(windowManager:any) {
+    this.windowManager = windowManager;
+  }
 }
 
 export class RecognitionRule {

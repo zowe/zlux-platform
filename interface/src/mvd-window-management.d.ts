@@ -25,6 +25,8 @@ declare namespace MVDWindowManagement {
     showWindow(windowId: MVDWindowManagement.WindowId): void;
     closeWindow(windowId: MVDWindowManagement.WindowId): void;
     closeAllWindows():void;
+    maximize(windowId: MVDWindowManagement.WindowId): void;
+
   }
 }
 
