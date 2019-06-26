@@ -1,4 +1,4 @@
-declare namespace ZLUXFramework {
+declare namespace ZLUXServerFramework {
 
     export interface Capabilities {
         canGetStatus: boolean,
