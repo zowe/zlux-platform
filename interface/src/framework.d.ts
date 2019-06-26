@@ -19,18 +19,11 @@ declare namespace ZLUXFramework {
         authorized: boolean
     }
 
-    export interface SessionState {
-        authenticated: boolean,
-        zssUsername: string,
-        sessionExpTime: number,
-        zssCookies: string
-    }
-
     export interface NodeAuthenticationInterface {
-        authenticate(request: Object, sessionState: SessionState): Promise<AuthenticateResult>;
+        authenticate(request: Object, sessionState: Object): Promise<AuthenticateResult>;
         getCapabilities(): Capabilities | Object;
-        getStatus(sessionState: SessionState): SessionState | Object;
-        refreshStatus(request: Object, sessionState: SessionState): Promise<AuthenticateResult>;
-        authorized(request: Object, sessionState: SessionState): AuthorizeResult;
+        getStatus(sessionState: Object): Object;
+        refreshStatus(request: Object, sessionState: Object): Promise<AuthenticateResult>;
+        authorized(request: Object, sessionState: Object): AuthorizeResult;
     }
 }
