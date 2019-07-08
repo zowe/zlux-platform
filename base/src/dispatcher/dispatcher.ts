@@ -579,7 +579,6 @@ export class Dispatcher implements ZLUX.Dispatcher {
         break;
       case ActionType.Minimize:
           if (targetId) {
-             this.log.info("the targetID is " + targetId);
              this.windowManager.minimize(targetId);
 
           }
