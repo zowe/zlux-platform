@@ -556,11 +556,10 @@ export class Dispatcher implements ZLUX.Dispatcher {
     }
   }
 
-  invokeAction(action:Action, eventContext: any):any{
+  invokeAction(action:Action, eventContext: any, targetId?: number):any{
     this.log.info("dispatcher.invokeAction on context "+JSON.stringify(eventContext));
     this.getActionTarget(action,eventContext).then( (target: ActionTarget) => {
       const wrapper = target.wrapper; 
-      var  targetId = eventContext.data.target || this.windowManager.nextId() - 1;
       switch (action.type) {
       case ActionType.Launch:
         if (!target.preexisting) {
@@ -579,14 +578,16 @@ export class Dispatcher implements ZLUX.Dispatcher {
         }
         break;
       case ActionType.Minimize:
-          this.log.debug("invoke Launch, which means do nothing if wrapper found: "+wrapper);
-          this.windowManager.minimize(targetId);
-          console.log(targetId);
+          if (targetId) {
+             this.log.info("the targetID is " + targetId);
+             this.windowManager.minimize(targetId);
+
+          }
           break;
       case ActionType.Maximize:
-         this.log.debug("invoke Launch, which means do nothing if wrapper found: "+wrapper);
-         this.windowManager.maximize(targetId);
-        this.log.warn('Max/Min not supported at this time. Concern if apps should be able to control other apps visibility.');
+          if (targetId) {
+             this.windowManager.maximize(targetId);
+          }
           break;
       default:
         this.log.warn("Unhandled action type = "+action.type);
@@ -594,8 +595,12 @@ export class Dispatcher implements ZLUX.Dispatcher {
     });
   }
 
-  setWindowManager(windowManager:any) {
-    this.windowManager = windowManager;
+  attachWindowManager(windowManager:any): boolean{
+    if (!this.windowManager) {
+       this.windowManager = windowManager;
+       return true;
+    }
+    return false;
   }
 }
 

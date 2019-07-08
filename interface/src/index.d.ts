@@ -36,12 +36,12 @@ declare namespace ZLUX {
     addRecognizer(predicate: RecognitionClause, actionID: string): void;
     registerAction(action: Action): void;
     getAction(recognizer: any): Action | undefined;
-    invokeAction(action: Action, eventContext: any): any;
+    invokeAction(action: Action, eventContext: any, targetId?: number): any;
     makeAction(id: string, defaultName: string, targetMode: ActionTargetMode, type: ActionType, targetPluginID: string, primaryArgument: any): Action;
     registerApplicationCallbacks(plugin: Plugin, applicationInstanceId: any, callbacks: ApplicationCallbacks): void;
     clear(): void;
     iframeLoaded(instanceId: MVDHosting.InstanceId, identifier: string);
-    setWindowManager(windowManager: any);
+    attachWindowManager(windowManager: any);
     constants: DispatcherConstants;
   }
 
