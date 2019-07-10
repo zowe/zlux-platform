@@ -37,6 +37,12 @@ declare namespace ZLUX {
     registerAction(action: Action): void;
     getAction(recognizer: any): Action | undefined;
     invokeAction(action: Action, eventContext: any): any;
+    callInstance(eventName: string, appInstanceId:string, data: Object): Promise<any>;
+    callAny(eventName: string, pluginId:string, data: Object): Promise<any>;
+    callAll(eventName: string, pluginId:string, data: Object): Promise<any>;
+    callEveryone(eventName: string, data: Object): Promise<any>;
+    registerEventListener(eventName: string, callback: EventListenerOrEventListenerObject | null, appId: string): void;
+    deregisterEventListener(eventName: string, callback: EventListenerOrEventListenerObject | null, appId: string, pluginId:string): void;
     makeAction(id: string, defaultName: string, targetMode: ActionTargetMode, type: ActionType, targetPluginID: string, primaryArgument: any): Action;
     registerApplicationCallbacks(plugin: Plugin, applicationInstanceId: any, callbacks: ApplicationCallbacks): void;
     clear(): void;
@@ -147,7 +153,6 @@ declare namespace ZLUX {
                 targetEncoding?: string | undefined, newName?: string | undefined,
                 forceOverwrite?: boolean | undefined, sessionID?: number | undefined, 
                  lastChunk?: boolean | undefined, responseType?: string): string;
-    omvsSegmentUri(): string;
     rasUri(uri: string): string;
     serverRootUri(uri: string): string;
     pluginResourceUri(pluginDefinition: Plugin, relativePath: string): string;

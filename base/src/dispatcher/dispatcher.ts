@@ -22,6 +22,8 @@
 
 // <reference types="ZLUX" />
 
+import { EventRegistrar } from './event-registrar'
+
 const IFRAME_LOAD_TIMEOUT = 180000; //3 minutes
 
 class ActionTarget {
@@ -79,11 +81,15 @@ export class Dispatcher implements ZLUX.Dispatcher {
    postMessageCallback: any = null;
    public readonly constants:DispatcherConstants = new DispatcherConstants();
    private log:ZLUX.ComponentLogger;
+   private eventRegistry:EventRegistrar = new EventRegistrar();
   
   constructor(logger: ZLUX.Logger){
      /* dispatcher created early on - refering to logger from window object as a result */
      this.log = logger.makeComponentLogger("ZLUX.Dispatcher");
      this.runHeartbeat();
+     this.registerEventListener("Launch", this.launchApp, "Dispatcher");
+     window.addEventListener("message", this.iframeMessageHandler, false);
+     
    }
 
   
@@ -143,7 +149,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
         let context = contexts.shift();
         if (context) {
           this.log.debug(`Sending postmessage of type launch to ${identifier} instance=${instanceId}`,context.data);
-          this.postMessageCallback(instanceId,{dispatchType: 'launch', dispatchData: {launchMetadata: context.data}});
+          this.postMessageCallback(instanceId,{dispatchType: 'launch', dispatchData: {launchMetadata: context.data, instanceId: instanceId}});
         }
       }
     }
@@ -474,12 +480,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
     return null;
   }
 
-  private createAsync(plugin:ZLUX.Plugin, action:Action, eventContext: any):Promise<ActionTarget>{
-    //let appPromise:Promise<MVDHosting.InstanceId>
-    if (!this.launchCallback){
-      return Promise.reject("no launch callback established");
-    }
-    let launchMetadata = this.buildObjectFromTemplate(action.primaryArgument, eventContext);
+  private addPendingIframe(plugin:ZLUX.Plugin, launchMetadata: any) {
     if (this.postMessageCallback && plugin.getWebContent().framework === 'iframe') {
       let contexts = this.pendingIframes.get(plugin.getIdentifier());
       if (!contexts) {
@@ -503,6 +504,15 @@ export class Dispatcher implements ZLUX.Dispatcher {
         }
       },IFRAME_LOAD_TIMEOUT+1);
     }
+  }
+
+  private createAsync(plugin:ZLUX.Plugin, action:Action, eventContext: any):Promise<ActionTarget>{
+    //let appPromise:Promise<MVDHosting.InstanceId>
+    if (!this.launchCallback){
+      return Promise.reject("no launch callback established");
+    }
+    let launchMetadata = this.buildObjectFromTemplate(action.primaryArgument, eventContext);
+    this.addPendingIframe(plugin, launchMetadata)
     let appPromise = 
       this.launchCallback(plugin, launchMetadata).then( (newAppID:MVDHosting.InstanceId) => {
         let wrapper = this.getAppInstanceWrapper(plugin,newAppID);
@@ -583,6 +593,174 @@ export class Dispatcher implements ZLUX.Dispatcher {
     });
   }
 
+  launchApp = (evt: CustomEvent) => {
+    var action = evt.detail.data.action;
+    var data = evt.detail.data.argumentData;
+    let plugin:ZLUX.Plugin = ZoweZLUX.pluginManager.getPlugin(action.targetPluginID);
+    this.createAsync(plugin, action, data);
+  }
+
+  callInstance(eventName: string, appInstanceId:string, data: Object) {
+    var pluginId = this.findPluginIdFromInstanceId(appInstanceId);
+    return this.call(eventName, pluginId, appInstanceId, data);
+  }
+
+  callAny(eventName: string, pluginId:string, data: Object) {
+    return this.call(eventName, pluginId, null, data, true);
+  }
+
+  callAll(eventName: string, pluginId:string, data: Object) {
+    return this.call(eventName, pluginId, null, data);
+  }
+
+  callEveryone(eventName: string, data: Object) {
+    return this.call(eventName, null, null, data);
+  }
+
+  call(eventName: string, pluginId:string | null, appInstanceId:string | null, data: Object, singleEvent: boolean = false) {
+    return new Promise((resolve, reject) => {
+      let effectiveEventNames = this.eventRegistry.findEventCodes(eventName, pluginId, appInstanceId);
+      if (effectiveEventNames) {
+        var evt: CustomEvent | any = null
+        var resultList:Event[] = []
+        var promises:Promise<any>[] = []
+        for (var i = 0; i < effectiveEventNames.length; i++) {
+          var eventDetail = {
+            data: data,
+            return: null
+          }
+          if (this.isIframe(effectiveEventNames[i].split("-")[effectiveEventNames[i].split("-").length-2])){
+            promises.push(this.postMessageCallbackWrapper(effectiveEventNames[i], eventDetail))
+          } else {
+            evt = new CustomEvent(effectiveEventNames[i], {
+              detail: eventDetail
+            });
+            window.dispatchEvent(evt);
+            resultList.push(evt.detail.return)
+          }
+          if (singleEvent) {
+            break;
+          }
+        }
+        Promise.all(promises).then((results) => {
+          results.forEach((element) => {
+            resultList.push(element)
+          })
+          resolve((resultList.length === 1 ? resultList[0] : resultList))
+        }).catch((err) => {
+            reject(err)
+        })
+      } else {
+        reject("The event \"" + eventName + "\" is not registered and could not be dispatched")
+      }
+    })
+  }
+
+  findPluginIdFromInstanceId(instanceId: string) {
+    let result = null;
+    if (instanceId === "Dispatcher") {
+      result = "Dispatcher";
+    } else {
+      this.instancesForTypes.forEach((value, key) => {
+        value.forEach((element) => {
+          if (element.applicationInstanceId === parseInt(instanceId)) {
+            result = key.slice(0, key.indexOf("@"));
+          }
+        });
+      });
+    }
+    return result;
+  }
+
+  isIframe(instanceId: string) {
+    let result = false;
+    this.instancesForTypes.forEach((value) => {
+      value.forEach((element) => {
+        if (element.applicationInstanceId === parseInt(instanceId)) {
+          result = element.isIframe
+        }
+      });
+    });
+    return result;
+  }
+
+  registerEventListener(eventName: string, callback: EventListenerOrEventListenerObject | null, appId: string) {
+    var pluginId = this.findPluginIdFromInstanceId(appId);
+    if (pluginId) {
+      this.eventRegistry.registerEvent(eventName, pluginId, appId);
+      let effectiveEventNames = this.eventRegistry.findEventCodes(eventName, pluginId, appId);
+      if (effectiveEventNames) {
+        effectiveEventNames.forEach((element: string) => {
+          if (!this.isIframe(appId) && callback) {
+            window.addEventListener(element, callback);
+          }
+        });
+      } else {
+        this.log.warn("The event \"" + eventName + "\" is not registered and listener could not be made");
+      }
+    }
+  }
+
+  deregisterEventListener(eventName: string, callback: EventListenerOrEventListenerObject | null, appId: string, pluginId:string) {
+    // the appid may have already been removed from the list of instances when this is called so the plugin id has to be passed in
+    if (pluginId) {
+      let effectiveEventNames = this.eventRegistry.findEventCodes(eventName, pluginId, appId);
+      if (effectiveEventNames) {
+        effectiveEventNames.forEach((element: string) => {
+          if (!this.isIframe(appId) && callback) {
+            window.removeEventListener(element, callback);
+          }
+        });
+      } else {
+        this.log.warn("The event \"" + eventName + "\" is not registered and listener could not unregister");
+      }
+      this.eventRegistry.deregisterEvent(eventName, pluginId, appId);
+    }
+  }
+
+  postMessageCallbackWrapper = (fullEventName:string, eventPayload: any) => {
+    return new Promise((fullresolve) => {
+      let nameList:Array<string> = fullEventName.split("-")
+      let instanceId = nameList[nameList.length-2];
+      
+      var returnListener: EventListenerOrEventListenerObject;
+      new Promise((resolve) => {
+        returnListener = (evt: MessageEvent) => {
+          if (evt.data.messageType === "return" && evt.data.arguments.appId === instanceId){
+            resolve(evt.data.arguments.returnValue)
+          }
+        }
+        window.addEventListener("message", returnListener)
+      }).then((data) => {
+        eventPayload.return = data
+        window.removeEventListener("message", returnListener)
+        fullresolve(data)
+      })
+      this.postMessageCallback(parseInt(instanceId), {dispatchType: 'event', dispatchData: {launchMetadata: eventPayload}})
+    })
+  }
+
+  iframeMessageHandler = (evt: any) => {
+    if (evt.data.messageType && evt.data.arguments) {
+      let args = evt.data.arguments;
+      switch (evt.data.messageType) {
+        case "RegisterEventListener":
+          this.registerEventListener(args.eventName, null, args.appId);
+          break;
+        case "DeregisterEventListener":
+          this.deregisterEventListener(args.eventName, null, args.appId, args.pluginId);
+          break;
+        case "CallEvent":
+          var context = this
+          this.call(args.eventName, args.pluginId, args.appId, args.data, args.singleEvent).then((results) => {
+            if (context.postMessageCallback) {
+              context.postMessageCallback(evt.source.instanceId, {dispatchType: 'return', dispatchData: {return: results}})
+            }
+          });
+          break;
+      }
+    }
+  }
 }
 
 export class RecognitionRule {
