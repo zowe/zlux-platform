@@ -578,14 +578,17 @@ export class Dispatcher implements ZLUX.Dispatcher {
         }
         break;
       case ActionType.Minimize:
-          if (targetId) {
+          if (targetId && this.windowManager) {
              this.windowManager.minimize(targetId);
-
+          }else {
+           this.log.warn('Target ID not provided or windowManager not initialized');
           }
           break;
       case ActionType.Maximize:
-          if (targetId) {
+          if (targetId && this.windowManager) {
              this.windowManager.maximize(targetId);
+          }else {
+             this.log.warn('Target ID not provided or windowManager not initialized');
           }
           break;
       default:
@@ -599,7 +602,9 @@ export class Dispatcher implements ZLUX.Dispatcher {
        this.windowManager = windowManager;
        return true;
     }
+    this.log.warn('windowManager has already been initialized');
     return false;
+
   }
 }
 
