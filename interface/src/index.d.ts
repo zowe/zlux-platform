@@ -37,6 +37,7 @@ declare namespace ZLUX {
     registerAction(action: Action): void;
     getAction(recognizer: any): Action | undefined;
     invokeAction(action: Action, eventContext: any): any;
+    addPendingIframe(plugin:ZLUX.Plugin, launchMetadata: any): void;
     callInstance(eventName: string, appInstanceId:string, data: Object): Promise<any>;
     callAny(eventName: string, pluginId:string, data: Object): Promise<any>;
     callAll(eventName: string, pluginId:string, data: Object): Promise<any>;

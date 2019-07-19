@@ -480,7 +480,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
     return null;
   }
 
-  private addPendingIframe(plugin:ZLUX.Plugin, launchMetadata: any) {
+  addPendingIframe(plugin:ZLUX.Plugin, launchMetadata: any) {
     if (this.postMessageCallback && plugin.getWebContent().framework === 'iframe') {
       let contexts = this.pendingIframes.get(plugin.getIdentifier());
       if (!contexts) {
