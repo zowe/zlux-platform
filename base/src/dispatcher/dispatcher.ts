@@ -24,6 +24,12 @@
 
 const IFRAME_LOAD_TIMEOUT = 180000; //3 minutes
 
+class ActionTarget {
+  constructor(
+    public readonly wrapper: ApplicationInstanceWrapper,
+    public readonly preexisting: boolean){}
+}
+
 export class RecognizerIndex {
    propertyName:string;
    valueMap:Map<any,RecognitionRule[]> = new Map();
@@ -468,7 +474,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
     return null;
   }
 
-  createAsync(plugin:ZLUX.Plugin, action:Action, eventContext: any):Promise<ApplicationInstanceWrapper>{
+  private createAsync(plugin:ZLUX.Plugin, action:Action, eventContext: any):Promise<ActionTarget>{
     //let appPromise:Promise<MVDHosting.InstanceId>
     if (!this.launchCallback){
       return Promise.reject("no launch callback established");
@@ -501,7 +507,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
       this.launchCallback(plugin, launchMetadata).then( (newAppID:MVDHosting.InstanceId) => {
         let wrapper = this.getAppInstanceWrapper(plugin,newAppID);
         if (wrapper){
-          return wrapper;
+          return new ActionTarget(wrapper,false);
         } else {
           return Promise.reject("could not find wrapper after launch/create for "+plugin.getIdentifier());
         }
@@ -511,7 +517,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
     return appPromise;
   }
 
-  getActionTarget(action:Action, eventContext: any):Promise<ApplicationInstanceWrapper>{
+  private getActionTarget(action:Action, eventContext: any):Promise<ActionTarget>{
     let plugin:ZLUX.Plugin|undefined = ZoweZLUX.pluginManager.getPlugin(action.targetPluginID);
     let applicationInstanceId:MVDHosting.InstanceId|undefined = eventContext.applicationInstanceId;
     if (plugin){
@@ -522,7 +528,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
         case ActionTargetMode.PluginFindAnyOrCreate:
           let wrappers:ApplicationInstanceWrapper[]|undefined = this.instancesForTypes.get(plugin.getKey());
           if (wrappers && wrappers.length > 0) {
-            return Promise.resolve(wrappers[0]);
+            return Promise.resolve(new ActionTarget(wrappers[0], true));
           } else {
             return this.createAsync(plugin,action,eventContext);
           }
@@ -532,7 +538,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
             existingWrapper = this.getAppInstanceWrapper(plugin,applicationInstanceId);
           }
           if (existingWrapper){
-            return Promise.resolve(existingWrapper);
+            return Promise.resolve(new ActionTarget(existingWrapper, true));
           } else {
             return this.createAsync(plugin, action, eventContext);
           }
@@ -548,11 +554,14 @@ export class Dispatcher implements ZLUX.Dispatcher {
 
   invokeAction(action:Action, eventContext: any):any{
     this.log.info("dispatcher.invokeAction on context "+JSON.stringify(eventContext));
-    this.getActionTarget(action,eventContext).then( (wrapper:ApplicationInstanceWrapper) => {
+    this.getActionTarget(action,eventContext).then( (target: ActionTarget) => {
+      const wrapper = target.wrapper;
       switch (action.type) {
       case ActionType.Launch:
-        this.log.debug("invoke Launch, which means do nothing if wrapper found: "+wrapper);
-        break;
+        if (!target.preexisting) {
+          this.log.debug("invoke Launch, which means do nothing if wrapper found: "+wrapper);
+          break;
+        } //else fall-through
       case ActionType.Message:
         this.log.debug('Invoking message type Action');
         //TODO is eventContext here different from this.buildObjectFromTemplate(action.primaryArgument, eventContext);

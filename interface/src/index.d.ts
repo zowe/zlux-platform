@@ -147,6 +147,7 @@ declare namespace ZLUX {
                 targetEncoding?: string | undefined, newName?: string | undefined,
                 forceOverwrite?: boolean | undefined, sessionID?: number | undefined, 
                  lastChunk?: boolean | undefined, responseType?: string): string;
+    omvsSegmentUri(): string;
     rasUri(uri: string): string;
     serverRootUri(uri: string): string;
     pluginResourceUri(pluginDefinition: Plugin, relativePath: string): string;
