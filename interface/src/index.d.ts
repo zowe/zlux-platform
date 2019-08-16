@@ -136,7 +136,7 @@ declare namespace ZLUX {
   interface UriBroker {
     desktopRootUri(): string;
     datasetMetadataHlqUri(updateCache?: boolean, types?: string, workAreaSize?: number, resumeName?: string, resumeCatalogName?: string): string;
-    datasetMetadataUri(dsn: string, detail?: string, types?: string, listMembers?: boolean, workAreaSize?: number, includeMigrated?: boolean, includeUnprintable?: boolean, resumeName?: string, resumeCatalogName?: string): string;
+    datasetMetadataUri(dsn: string, detail?: string, types?: string, listMembers?: boolean, addQualifiers?: string, workAreaSize?: number, includeMigrated?: boolean, includeUnprintable?: boolean, resumeName?: string, resumeCatalogName?: string): string;
     datasetContentsUri(dsn: string): string;
     VSAMdatasetContentsUri(dsn: string, closeAfter?: boolean): string;
     /*TODO: for breaking change, we need to change this into a passed object so that its way cleaner and
