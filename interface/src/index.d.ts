@@ -180,7 +180,8 @@ declare namespace ZLUX {
 
   const enum PluginType {
     Desktop = "desktop",
-    Application = "application"
+    Application = "application",
+    Bootstrap = "bootstrap"
   }
 
   interface Plugin {
@@ -716,7 +717,7 @@ declare class ZoweZLUXResources {
   static logger: ZLUX.Logger;
   static registry: ZLUX.Registry;
   //previously was NotificationManager
-  static notificationManager: any;
+  static zoweNotificationManager: any;
   static globalization: ZLUX.Globalization;
 }
 

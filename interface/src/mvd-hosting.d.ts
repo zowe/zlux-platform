@@ -18,10 +18,12 @@ declare namespace MVDHosting {
     ApplicationManagerToken = "com.rs.mvd.hosting.application-manager",
     ViewportManagerToken = "com.rs.mvd.hosting.viewport-manager",
     PluginManagerToken = "com.rs.mvd.hosting.plugin-manager",
-    AuthenticationManagerToken = "com.rs.mvd.hosting.authentication-manager"
+    AuthenticationManagerToken = "com.rs.mvd.hosting.authentication-manager",
+    ZoweNotificationManagerToken = "com.rs.mvd.hosting.zowe-notification-manager",
+
   }
 
-  export const enum NotificationType {
+  export const enum ZoweNotificationType {
     System = 1,
     Application = 2
   }
@@ -89,17 +91,21 @@ declare namespace MVDHosting {
     performLogin(username: string, password: string): Observable<Response>;
   }
 
-  export interface NotificationManagerInterface {
-    push(notification: Notification): void;
-    pop(): Notification | void;
-    getAll(): Notification[] | void;
-    getAllByCategory(type: MVDHosting.NotificationType): Notification[] | void;
+  export interface ZoweNotificationManagerInterface {
+    setURL(url: string): void;
+    getURL(): string;
+    push(notification: ZoweNotification): void;
+    pop(): ZoweNotification | void;
+    getAll(): ZoweNotification[] | void;
+    getAllByCategory(type: MVDHosting.ZoweNotificationType): ZoweNotification[] | void;
     getCount(): number;
-    addMessageHandler(object: NotificationWatcher): void;
+    getCountTest(): void;
+    addMessageHandler(object: ZoweNotificationWatcher): void;
   }
 
-  export interface NotificationWatcher {
+  export interface ZoweNotificationWatcher {
     handleMessageAdded(): void;
+    handleMessageAddedTest(data: any): void;
   }
 }
 
