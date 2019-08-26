@@ -110,7 +110,7 @@ declare namespace ZLUX {
   }
 
   interface Logger {
-    makeComponentLogger(componentName: string): ComponentLogger;
+    makeComponentLogger(componentName: string, messages?: any): ComponentLogger;
     setLogLevelForComponentName(componentName: string, level: number): void;
   }
 
