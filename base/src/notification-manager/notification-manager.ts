@@ -61,15 +61,15 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
     this.ws.onmessage = function(message) {
       console.log("123hey")
       console.log(message)
-      _this.updateStuff(message);
+      _this.updateStuff(JSON.parse(message.data));
     }
     // this.ws.send("test")
   }
 
-  updateStuff(message: MessageEvent) {
+  updateStuff(message: any) {
     console.log(message)
     for (let i = 0; i < this.handlers.length; i++) {
-      this.handlers[i].handleMessageAddedTest(message.data);
+      this.handlers[i].handleMessageAddedTest(message);
     }
   }
 
@@ -109,7 +109,7 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
     for (let i = 0; i < this.handlers.length; i++) {
       this.handlers[i].handleMessageAdded();
     }
-    this.ws.send("message")
+    this.ws.send(JSON.stringify(notification))
   }
 
   pop(): ZoweNotification | void {
