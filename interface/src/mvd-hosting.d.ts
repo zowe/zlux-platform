@@ -97,13 +97,11 @@ declare namespace MVDHosting {
     getAll(): ZoweNotification[] | void;
     getAllByCategory(type: MVDHosting.ZoweNotificationType): ZoweNotification[] | void;
     getCount(): number;
-    test(): void;
     addMessageHandler(object: ZoweNotificationWatcher): void;
   }
 
   export interface ZoweNotificationWatcher {
-    handleMessageAdded(): void;
-    handleMessageAddedTest(data: any, index: number): void;
+    handleMessageAdded(data: any, index: number): void;
   }
 }
 

@@ -10,19 +10,15 @@
 */
 
 import { ZoweNotification } from './notification';
-// import { PluginManager } from '../../../../zlux-app-manager/virtual-desktop/src/app/plugin-manager/shared/plugin-manager'
-// import { Plugin } from '../plugin-manager/plugin'
 
 export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManagerInterface {
   private notificationCache: any[];
-  private testCache: any[];
   private handlers: MVDHosting.ZoweNotificationWatcher[];
   private ws: WebSocket;
   public url: string;
 
   constructor() {
     this.notificationCache = new Array<ZoweNotification>();
-    this.testCache = new Array<ZoweNotification>();
     this.handlers = new Array<MVDHosting.ZoweNotificationWatcher>();
   }
 
@@ -32,14 +28,14 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
     var _this = this;
     this.ws.onmessage = function(message) {
       console.log(message)
-      _this.testCache.push((JSON.parse(message.data)['notification']) as ZoweNotification)
+      _this.notificationCache.push((JSON.parse(message.data)['notification']) as ZoweNotification)
       _this.updateStuff(JSON.parse(message.data));
     }
   }
 
   updateStuff(message: any) {
     for (let i = 0; i < this.handlers.length; i++) {
-      this.handlers[i].handleMessageAddedTest(message, this.testCache.length -1);
+      this.handlers[i].handleMessageAdded(message, this.notificationCache.length -1);
     }
   }
 
@@ -60,33 +56,23 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
   }
 
   push(notification: ZoweNotification): void {
-    // this.notificationCache.push(notification);
-    // for (let i = 0; i < this.handlers.length; i++) {
-    //   this.handlers[i].handleMessageAdded();
-    // }
-    // let index = this.notificationCache.indexOf(notification)
-    // console.log(index)
-    // console.log({'index': index, notification})
     this.ws.send(JSON.stringify(notification))
   }
 
   pop(): ZoweNotification | void {
-    console.log('does this ever get called?')
     let n = this.notificationCache.pop();
     for (let i = 0; i < this.handlers.length; i++) {
-      this.handlers[i].handleMessageAdded();
+      // this.handlers[i].handleMessageAdded();
     }
     return n;
   }
 
   removeFromCache(index: number): void{
-    console.log('doesnt this work')
-    // this.notificationCache.splice(index, 1)
-    this.testCache.splice(index, 1)
+    this.notificationCache.splice(index, 1)
   }
 
   getAll(): ZoweNotification[] {
-    let copy: ZoweNotification[] = this.testCache.slice(0);
+    let copy: ZoweNotification[] = this.notificationCache.slice(0);
 
     /* NgFor is going from first element. We need to start from the end to show the most recent notifications first.
     It would make more sense to just pop all elements from notification cache, but if we closed the app, they'd all be gone.
@@ -119,12 +105,7 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
   }
 
   getCount(): number {
-    return this.testCache.length;
-  }
-
-  test(): void {
-    console.log(this.notificationCache)
-    console.log(this.testCache)
+    return this.notificationCache.length;
   }
 
   addMessageHandler(object: MVDHosting.ZoweNotificationWatcher) {
