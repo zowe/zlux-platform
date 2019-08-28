@@ -212,7 +212,32 @@ export class Dispatcher implements ZLUX.Dispatcher {
      }
    }
 
+   getRecognizersForCapabilities(capabilities: string[], tuple: any) {
+     const recognizersForCapabilities: RecognitionRule[] = this.getRecognizersForCapabilitiesInternal(capabilities);
+
+     return this.getRecognizersInternal(recognizersForCapabilities, tuple);
+   }
+
+   getRecognizersForCapabilitiesInternal(capabilities: string[]):RecognitionRule[] {
+     if (!capabilities || capabilities.length === 0) {
+       return this.recognizers;
+     } else {
+       return this.recognizers.filter( (recognizer: RecognitionRule) => {
+         const recognizerCapabilities: string[] = recognizer.capabilities;
+         if (recognizerCapabilities) {
+           return capabilities.some(capability => recognizerCapabilities.indexOf(capability) >= 0)
+         } else {
+           return false;
+         }
+       });
+     }
+   }
+
    getRecognizers(tuple:any):RecognitionRule[] {
+     return this.getRecognizersInternal(this.recognizers, tuple);
+   }
+
+   getRecognizersInternal(recognizerSet: RecognitionRule[], tuple: any):RecognitionRule[] {
      let matchedRecognizers:any[] = [];
      // we can get the set of recognizers that match on this property at top clause
      // and those that don't, too.
@@ -241,7 +266,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
          return matchedRecognizers;  // since we had an index, good enough
        }
      } 
-     this.recognizers.forEach( (recognizer:RecognitionRule) => {
+     recognizerSet.forEach( (recognizer:RecognitionRule) => {
        if (recognizer.predicate.match(tuple)){
          matchedRecognizers.push(recognizer);
        }
@@ -579,6 +604,8 @@ export class Dispatcher implements ZLUX.Dispatcher {
 export class RecognitionRule {
   predicate:RecognitionClause;
   actionID:string;
+  capabilities: string[];
+  originatingPluginID: string;
 
   constructor(predicate:RecognitionClause, actionID:string){
     this.predicate = predicate;

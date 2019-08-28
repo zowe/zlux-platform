@@ -32,6 +32,7 @@ declare namespace ZLUX {
     setLaunchHandler(launchCallback: any): void;
     setPostMessageHandler(postMessageCallback: any): void;
     getRecognizers(tuple: any): RecognitionRule[];
+    getRecognizersForCapabilities(capabilities: string[], tuple: any): RecognitionRule[];
     addRecognizerFromObject(predicateObject:RecognitionObjectPropClause | RecognitionObjectOpClause, actionID:string):void;
     addRecognizer(predicate: RecognitionClause, actionID: string): void;
     registerAction(action: Action): void;
