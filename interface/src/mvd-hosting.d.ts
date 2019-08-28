@@ -18,9 +18,7 @@ declare namespace MVDHosting {
     ApplicationManagerToken = "com.rs.mvd.hosting.application-manager",
     ViewportManagerToken = "com.rs.mvd.hosting.viewport-manager",
     PluginManagerToken = "com.rs.mvd.hosting.plugin-manager",
-    AuthenticationManagerToken = "com.rs.mvd.hosting.authentication-manager",
-    ZoweNotificationManagerToken = "com.rs.mvd.hosting.zowe-notification-manager",
-
+    AuthenticationManagerToken = "com.rs.mvd.hosting.authentication-manager"
   }
 
   export const enum ZoweNotificationType {
@@ -99,13 +97,13 @@ declare namespace MVDHosting {
     getAll(): ZoweNotification[] | void;
     getAllByCategory(type: MVDHosting.ZoweNotificationType): ZoweNotification[] | void;
     getCount(): number;
-    getCountTest(): void;
+    test(): void;
     addMessageHandler(object: ZoweNotificationWatcher): void;
   }
 
   export interface ZoweNotificationWatcher {
     handleMessageAdded(): void;
-    handleMessageAddedTest(data: any): void;
+    handleMessageAddedTest(data: any, index: number): void;
   }
 }
 

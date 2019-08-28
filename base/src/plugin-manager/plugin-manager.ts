@@ -17,7 +17,6 @@ export class PluginManager {
   private static pluginsById:Map<string,ZLUX.Plugin> = new Map();
 
   private static parsePluginDefinitions(pluginData: any): Plugin[] {
-    console.log(pluginData)
     if (pluginData["pluginDefinitions"] != null) {
       const pluginDefinitions: any[] = pluginData["pluginDefinitions"];
       const plugins = pluginDefinitions.map(definition => {
@@ -42,12 +41,10 @@ export class PluginManager {
   }
 
   static getPlugin(id:string):ZLUX.Plugin|undefined {
-    console.log(this.pluginsById)
     return PluginManager.pluginsById.get(id);
   }
 
   static loadPlugins(pluginType?: ZLUX.PluginType): Promise<ZLUX.Plugin[]> {
-    // console.log(pluginType)
     return new Promise((resolve, reject) => {
       var request = new XMLHttpRequest();
       request.onreadystatechange = function () {
@@ -69,7 +66,6 @@ export class PluginManager {
           }
         }
       };
-      // request.open("GET", ZoweZLUX.uriBroker.pluginListUri(), true);
       request.open("GET", ZoweZLUX.uriBroker.pluginListUri(pluginType), true);
       request.send();
     });

@@ -34,6 +34,7 @@ export abstract class Plugin implements ZLUX.Plugin {
 
   static parsePluginDefinition(definition: any): Plugin {
     const apiVersion = new SemanticVersion(definition.apiVersion);
+    
     switch (apiVersion.major) {
       case 0://beta
         return new Plugin_0(definition);

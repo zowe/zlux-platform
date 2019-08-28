@@ -15,61 +15,31 @@ import { ZoweNotification } from './notification';
 
 export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManagerInterface {
   private notificationCache: any[];
+  private testCache: any[];
   private handlers: MVDHosting.ZoweNotificationWatcher[];
   private ws: WebSocket;
   public url: string;
-  host: any;
-  port: any;
-  securityType: any;
-  connectionSettings: any;
-  modType: any;
-  row: any;
-  column: any;
-  selectedCodepage: any;
-
-
 
   constructor() {
     this.notificationCache = new Array<ZoweNotification>();
+    this.testCache = new Array<ZoweNotification>();
     this.handlers = new Array<MVDHosting.ZoweNotificationWatcher>();
-    // console.log(ZoweZLUX)
-    // let test: MVDHosting.DesktopPluginDefinition;
-
-    const myHost = window.location.host;
-    const protocol = window.location.protocol;
-    const wsProtocol = (protocol === 'https:') ? 'wss:' : 'ws:';
-    let computedURL:string = `${wsProtocol}//${myHost}/plugins/org.zowe.zlux.bootstrap/services/adminnotificationsdata/`;
-    console.log(computedURL)
-    this.connectionSettings = {
-      host: this.host,
-      port: this.port,
-      security: {
-        type: this.securityType
-      },
-      deviceType: Number(this.modType),
-      alternateHeight: this.row,
-      alternateWidth: this.column,
-      charsetName: this.selectedCodepage
-    }
   }
 
   setURL(url: string){
     this.url = url;
     this.ws = new WebSocket(url);
-    console.log("hey123")
     var _this = this;
     this.ws.onmessage = function(message) {
-      console.log("123hey")
       console.log(message)
+      _this.testCache.push((JSON.parse(message.data)['notification']) as ZoweNotification)
       _this.updateStuff(JSON.parse(message.data));
     }
-    // this.ws.send("test")
   }
 
   updateStuff(message: any) {
-    console.log(message)
     for (let i = 0; i < this.handlers.length; i++) {
-      this.handlers[i].handleMessageAddedTest(message);
+      this.handlers[i].handleMessageAddedTest(message, this.testCache.length -1);
     }
   }
 
@@ -79,9 +49,7 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
 
   ngOnInit() {
 
-    console.log("yyya")
     this.ws.onmessage = function () {
-      console.log("test")
       // Do something?
     }
 
@@ -91,28 +59,19 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
     }
   }
 
-  // sendmessage(notification: ZoweNotification): void {
-
-  // }
-
   push(notification: ZoweNotification): void {
-    // let pluginTest = new Plugin()
-    // console.log(pluginTest)
-    // let pluginTest: ZLUX.PluginType = ZLUX.PluginType.Desktop
-    // console.log(ZoweZLUX.uriBroker.pluginListUri(pluginTest))
-    // };
-    // console.log(ZoweZLUX.pluginManager.getDesktopPlugin())
-    //.findPluginDefinition("org.zowe.zlux.bootstrap")
-    // console.log(ZoweZLUX.uriBroker.pluginWSUri(plugin, 'adminnotificationdata', ''))
-    console.log(this.handlers)
-    this.notificationCache.push(notification);
-    for (let i = 0; i < this.handlers.length; i++) {
-      this.handlers[i].handleMessageAdded();
-    }
+    // this.notificationCache.push(notification);
+    // for (let i = 0; i < this.handlers.length; i++) {
+    //   this.handlers[i].handleMessageAdded();
+    // }
+    // let index = this.notificationCache.indexOf(notification)
+    // console.log(index)
+    // console.log({'index': index, notification})
     this.ws.send(JSON.stringify(notification))
   }
 
   pop(): ZoweNotification | void {
+    console.log('does this ever get called?')
     let n = this.notificationCache.pop();
     for (let i = 0; i < this.handlers.length; i++) {
       this.handlers[i].handleMessageAdded();
@@ -120,8 +79,14 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
     return n;
   }
 
+  removeFromCache(index: number): void{
+    console.log('doesnt this work')
+    // this.notificationCache.splice(index, 1)
+    this.testCache.splice(index, 1)
+  }
+
   getAll(): ZoweNotification[] {
-    let copy: ZoweNotification[] = this.notificationCache.slice(0);
+    let copy: ZoweNotification[] = this.testCache.slice(0);
 
     /* NgFor is going from first element. We need to start from the end to show the most recent notifications first.
     It would make more sense to just pop all elements from notification cache, but if we closed the app, they'd all be gone.
@@ -154,10 +119,12 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
   }
 
   getCount(): number {
-    return this.notificationCache.length;
+    return this.testCache.length;
   }
 
-  getCountTest(): void {
+  test(): void {
+    console.log(this.notificationCache)
+    console.log(this.testCache)
   }
 
   addMessageHandler(object: MVDHosting.ZoweNotificationWatcher) {
