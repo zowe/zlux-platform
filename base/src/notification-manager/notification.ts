@@ -16,8 +16,10 @@ export class ZoweNotification {
   private type: MVDHosting.ZoweNotificationType;
   private plugin: string;
   private config: any;
+  private title: string;
 
-  constructor(message: string, type: MVDHosting.ZoweNotificationType, plugin: string, config?: any) {
+  constructor(title: string, message: string, type: MVDHosting.ZoweNotificationType, plugin: string, config?: any) {
+    this.title = title;
     this.message = message;
     this.type = type;
     this.date = new Date();
@@ -25,6 +27,10 @@ export class ZoweNotification {
     if (config) {
       this.config = config
     }
+  }
+
+  getTitle(): string {
+    return this.title;
   }
 
   getMessage(): string {

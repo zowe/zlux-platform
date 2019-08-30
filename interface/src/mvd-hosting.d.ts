@@ -90,7 +90,7 @@ declare namespace MVDHosting {
   }
 
   export interface ZoweNotificationManagerInterface {
-    setURL(url: string): void;
+    _setURL(url: string): void;
     getURL(): string;
     push(notification: ZoweNotification): void;
     pop(): ZoweNotification | void;
