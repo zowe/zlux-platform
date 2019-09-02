@@ -219,11 +219,11 @@ export class Dispatcher implements ZLUX.Dispatcher {
    }
 
    getRecognizersForCapabilitiesInternal(capabilities: string[]):RecognitionRule[] {
-     if (!capabilities || capabilities.length === 0) {
+     if (!(capabilities && capabilities.length > 0)) {
        return this.recognizers;
      } else {
        return this.recognizers.filter( (recognizer: RecognitionRule) => {
-         const recognizerCapabilities: string[] = recognizer.capabilities;
+         const recognizerCapabilities: string[] | undefined = recognizer.capabilities;
          if (recognizerCapabilities) {
            return capabilities.some(capability => recognizerCapabilities.indexOf(capability) >= 0)
          } else {
@@ -274,8 +274,18 @@ export class Dispatcher implements ZLUX.Dispatcher {
      return matchedRecognizers;
    }
 
-  addRecognizerFromObject(predicateObject:ZLUX.RecognitionObjectPropClause | ZLUX.RecognitionObjectOpClause, actionID:string):void{
-    this.addRecognizer(this.addRecognizerFromObjectInner(predicateObject), actionID);
+  addRecognizerObject(recognizer:ZLUX.RecognizerObject): void {
+    this.addRecognizer(this.addRecognizerFromObjectInner(recognizer.clause), recognizer.id, recognizer.capabilities);
+  }
+
+  /**
+   * @deprecated. replaced by addRecognizerObject
+   * @param predicateObject 
+   * @param actionID 
+   * @param capabilities 
+   */
+  addRecognizerFromObject(predicateObject:ZLUX.RecognitionObjectPropClause | ZLUX.RecognitionObjectOpClause, actionID:string, capabilities?: string[]):void{
+    this.addRecognizer(this.addRecognizerFromObjectInner(predicateObject), actionID, capabilities);
   }
 
   private addRecognizerFromObjectInner(predicateObject:ZLUX.RecognitionObjectPropClause | ZLUX.RecognitionObjectOpClause):RecognitionClause{
@@ -309,8 +319,8 @@ export class Dispatcher implements ZLUX.Dispatcher {
     }
   }
   
-   addRecognizer(predicate:RecognitionClause, actionID:string):void{
-     let recognitionRule:RecognitionRule = new RecognitionRule(predicate,actionID);
+   addRecognizer(predicate:RecognitionClause, actionID:string, capabilities?: string[]):void{
+     let recognitionRule:RecognitionRule = new RecognitionRule(predicate,actionID, capabilities);
      this.recognizers.push(recognitionRule);
      if (predicate.operation == RecognitionOp.AND){
        for (let subClause of predicate.subClauses){
@@ -604,12 +614,13 @@ export class Dispatcher implements ZLUX.Dispatcher {
 export class RecognitionRule {
   predicate:RecognitionClause;
   actionID:string;
-  capabilities: string[];
+  capabilities?: string[];
   originatingPluginID: string;
 
-  constructor(predicate:RecognitionClause, actionID:string){
+  constructor(predicate:RecognitionClause, actionID:string, capabilities?: string[]){
     this.predicate = predicate;
     this.actionID = actionID;
+    this.capabilities = capabilities;
   }
 
   static isReservedKey(key:string):boolean{

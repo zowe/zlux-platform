@@ -33,7 +33,8 @@ declare namespace ZLUX {
     setPostMessageHandler(postMessageCallback: any): void;
     getRecognizers(tuple: any): RecognitionRule[];
     getRecognizersForCapabilities(capabilities: string[], tuple: any): RecognitionRule[];
-    addRecognizerFromObject(predicateObject:RecognitionObjectPropClause | RecognitionObjectOpClause, actionID:string):void;
+    addRecognizerFromObject(predicateObject:RecognitionObjectPropClause | RecognitionObjectOpClause, actionID:string, capabilities?: string[]):void;
+    addRecognizerObject(recoginzerObject: ZLUX.RecognizerObject): void;
     addRecognizer(predicate: RecognitionClause, actionID: string): void;
     registerAction(action: Action): void;
     getAction(recognizer: any): Action | undefined;
@@ -47,6 +48,7 @@ declare namespace ZLUX {
 
   type RecognizerObject = {
     id: string,
+    capabilities?: string[],
     clause: RecognitionObjectPropClause | RecognitionObjectOpClause
   }
 
