@@ -25,7 +25,7 @@ declare namespace MVDWindowManagement {
     showWindow(windowId: MVDWindowManagement.WindowId): void;
     closeWindow(windowId: MVDWindowManagement.WindowId): void;
     closeAllWindows():void;
-
+    requestWindowFocus(windowId: MVDWindowManagement.WindowId): boolean;
   }
 }
 

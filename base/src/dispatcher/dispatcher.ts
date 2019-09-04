@@ -100,6 +100,23 @@ export class Dispatcher implements ZLUX.Dispatcher {
    static dispatcherHeartbeatInterval:number = 60000; /* one minute */
 
    clear(): void {
+     let typesIt = this.instancesForTypes.keys();
+     let type = typesIt.next();
+     while (!type.done) {
+       let plugin = type.value;
+       let instancesArray = this.instancesForTypes.get(plugin) || [];
+       for (let j = 0; j < instancesArray.length; j++) {
+         let instance = instancesArray[j];
+         let watchers = this.pluginWatchers.get(plugin);
+         if (watchers) {
+           for (let k = 0; k < watchers.length; k++) {
+             watchers[k].instanceRemoved(instance.applicationInstanceId);
+           }
+         }
+         return;
+       }
+       type = typesIt.next();
+     }
     this.instancesForTypes.clear();
     this.indexedRecognizers.clear();
     this.recognizers = [];
