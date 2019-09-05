@@ -87,7 +87,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
      /* dispatcher created early on - refering to logger from window object as a result */
      this.log = logger.makeComponentLogger("ZLUX.Dispatcher");
      this.runHeartbeat();
-     this.registerEventListener("Launch", this.launchApp, "Dispatcher");
+     this.registerEventListener("Launch", this.launchApp, "ZLUX.Dispatcher");
      window.addEventListener("message", this.iframeMessageHandler, false);
      
    }
@@ -602,22 +602,22 @@ export class Dispatcher implements ZLUX.Dispatcher {
 
   callInstance(eventName: string, appInstanceId:string, data: Object) {
     var pluginId = this.findPluginIdFromInstanceId(appInstanceId);
-    return this.call(eventName, pluginId, appInstanceId, data);
+    return this.call(eventName, pluginId, appInstanceId, data, true, true);
   }
 
   callAny(eventName: string, pluginId:string, data: Object) {
-    return this.call(eventName, pluginId, null, data, true);
+    return this.call(eventName, pluginId, null, data, true, true);
   }
 
-  callAll(eventName: string, pluginId:string, data: Object) {
-    return this.call(eventName, pluginId, null, data);
+  callAll(eventName: string, pluginId:string, data: Object, failOnError: boolean = false) {
+    return this.call(eventName, pluginId, null, data, false, failOnError);
   }
 
-  callEveryone(eventName: string, data: Object) {
-    return this.call(eventName, null, null, data);
+  callEveryone(eventName: string, data: Object, failOnError: boolean = false) {
+    return this.call(eventName, null, null, data, false, failOnError);
   }
 
-  call(eventName: string, pluginId:string | null, appInstanceId:string | null, data: Object, singleEvent: boolean = false) {
+  call(eventName: string, pluginId:string | null, appInstanceId:string | null, data: Object, singleEvent: boolean, failOnError: boolean) {
     return new Promise((resolve, reject) => {
       let effectiveEventNames = this.eventRegistry.findEventCodes(eventName, pluginId, appInstanceId);
       if (effectiveEventNames) {
@@ -629,7 +629,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
             data: data,
             return: null
           }
-          if (this.isIframe(effectiveEventNames[i].split("-")[effectiveEventNames[i].split("-").length-2])){
+          if (this.isIframe(effectiveEventNames[i].split("_")[effectiveEventNames[i].split("_").length-2])){
             promises.push(this.postMessageCallbackWrapper(effectiveEventNames[i], eventDetail))
           } else {
             evt = new CustomEvent(effectiveEventNames[i], {
@@ -642,9 +642,13 @@ export class Dispatcher implements ZLUX.Dispatcher {
             break;
           }
         }
-        Promise.all(promises).then((results) => {
+        this.allSettled(promises).then((results) => {
           results.forEach((element) => {
-            resultList.push(element)
+            if (element.state === 'fulfilled') {
+              resultList.push(element.value)
+            } else if(failOnError) {
+              reject(element.value)
+            }
           })
           resolve((resultList.length === 1 ? resultList[0] : resultList))
         }).catch((err) => {
@@ -656,10 +660,18 @@ export class Dispatcher implements ZLUX.Dispatcher {
     })
   }
 
+  allSettled(promises: Promise<any>[]) {
+    let wrappedPromises = promises.map(p => Promise.resolve(p)
+        .then(
+            val => ({ state: 'fulfilled', value: val }),
+            err => ({ state: 'rejected', value: err })));
+    return Promise.all(wrappedPromises);
+}
+
   findPluginIdFromInstanceId(instanceId: string) {
     let result = null;
-    if (instanceId === "Dispatcher") {
-      result = "Dispatcher";
+    if (instanceId === "ZLUX.Dispatcher") {
+      result = "ZLUX.Dispatcher";
     } else {
       this.instancesForTypes.forEach((value, key) => {
         value.forEach((element) => {
@@ -720,13 +732,13 @@ export class Dispatcher implements ZLUX.Dispatcher {
 
   postMessageCallbackWrapper = (fullEventName:string, eventPayload: any) => {
     return new Promise((fullresolve) => {
-      let nameList:Array<string> = fullEventName.split("-")
+      let nameList:Array<string> = fullEventName.split("_")
       let instanceId = nameList[nameList.length-2];
       
       var returnListener: EventListenerOrEventListenerObject;
       new Promise((resolve) => {
         returnListener = (evt: MessageEvent) => {
-          if (evt.data.messageType === "return" && evt.data.arguments.appId === instanceId){
+          if (evt.data.messageType === "return" && evt.data.arguments.appId.toString() === instanceId){
             resolve(evt.data.arguments.returnValue)
           }
         }
@@ -752,7 +764,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
           break;
         case "CallEvent":
           var context = this
-          this.call(args.eventName, args.pluginId, args.appId, args.data, args.singleEvent).then((results) => {
+          this.call(args.eventName, args.pluginId, args.appId, args.data, args.singleEvent, args.failOnError).then((results) => {
             if (context.postMessageCallback) {
               context.postMessageCallback(evt.source.instanceId, {dispatchType: 'return', dispatchData: {return: results}})
             }
