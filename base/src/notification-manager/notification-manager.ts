@@ -25,11 +25,9 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
   _setURL(url: string){
     //set url only once
     this.url = url;
-    console.log("@@@@@@@@@@@@@@@@@@@@@@@2")
     this.ws = new WebSocket(url);
     var _this = this;
     this.ws.onmessage = function(message) {
-      console.log(message)
       _this.notificationCache.push((JSON.parse(message.data)['notification']) as ZoweNotification)
       _this.updateStuff(JSON.parse(message.data));
     }
@@ -64,17 +62,16 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
   }
 
   push(notification: ZoweNotification): void {
-    console.log(notification)
     this.ws.send(JSON.stringify(notification))
   }
 
-  pop(): ZoweNotification | void {
-    let n = this.notificationCache.pop();
-    for (let i = 0; i < this.handlers.length; i++) {
-      // this.handlers[i].handleMessageAdded();
-    }
-    return n;
-  }
+  // pop(): ZoweNotification | void {
+  //   let n = this.notificationCache.pop();
+  //   for (let i = 0; i < this.handlers.length; i++) {
+  //     // this.handlers[i].handleMessageAdded();
+  //   }
+  //   return n;
+  // }
 
   removeFromCache(index: number): void{
     this.notificationCache.splice(index, 1)

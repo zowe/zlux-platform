@@ -717,7 +717,7 @@ declare class ZoweZLUXResources {
   static logger: ZLUX.Logger;
   static registry: ZLUX.Registry;
   //previously was NotificationManager
-  static zoweNotificationManager: any;
+  static notificationManager: any;
   static globalization: ZLUX.Globalization;
 }
 

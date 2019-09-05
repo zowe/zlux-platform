@@ -93,7 +93,7 @@ declare namespace MVDHosting {
     _setURL(url: string): void;
     getURL(): string;
     push(notification: ZoweNotification): void;
-    pop(): ZoweNotification | void;
+    // pop(): ZoweNotification | void;
     getAll(): ZoweNotification[] | void;
     getAllByCategory(type: MVDHosting.ZoweNotificationType): ZoweNotification[] | void;
     getCount(): number;
