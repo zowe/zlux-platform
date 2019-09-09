@@ -82,6 +82,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
    public readonly constants:DispatcherConstants = new DispatcherConstants();
    private log:ZLUX.ComponentLogger;
    private eventRegistry:EventRegistrar = new EventRegistrar();
+   private windowManager: any;
   
   constructor(logger: ZLUX.Logger){
      /* dispatcher created early on - refering to logger from window object as a result */
@@ -103,6 +104,23 @@ export class Dispatcher implements ZLUX.Dispatcher {
    static dispatcherHeartbeatInterval:number = 60000; /* one minute */
 
    clear(): void {
+     let typesIt = this.instancesForTypes.keys();
+     let type = typesIt.next();
+     while (!type.done) {
+       let plugin = type.value;
+       let instancesArray = this.instancesForTypes.get(plugin) || [];
+       for (let j = 0; j < instancesArray.length; j++) {
+         let instance = instancesArray[j];
+         let watchers = this.pluginWatchers.get(plugin);
+         if (watchers) {
+           for (let k = 0; k < watchers.length; k++) {
+             watchers[k].instanceRemoved(instance.applicationInstanceId);
+           }
+         }
+         return;
+       }
+       type = typesIt.next();
+     }
     this.instancesForTypes.clear();
     this.indexedRecognizers.clear();
     this.recognizers = [];
@@ -182,6 +200,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
    registerPluginInstance(plugin: ZLUX.Plugin, applicationInstanceId: MVDHosting.InstanceId, isIframe:boolean, isEmbedded?:boolean): void {
      this.log.info("Registering plugin="+plugin+" id="+applicationInstanceId);
      let instanceWrapper = new ApplicationInstanceWrapper(applicationInstanceId,isIframe);
+
      let key = plugin.getKey();
      if (!this.instancesForTypes.get(key)){
        this.instancesForTypes.set(key,[instanceWrapper]);
@@ -562,14 +581,13 @@ export class Dispatcher implements ZLUX.Dispatcher {
     }
   }
 
-  invokeAction(action:Action, eventContext: any):any{
+  invokeAction(action:Action, eventContext: any, targetId?: number):any{
     this.log.info("dispatcher.invokeAction on context "+JSON.stringify(eventContext));
     this.getActionTarget(action,eventContext).then( (target: ActionTarget) => {
-      const wrapper = target.wrapper;
+      const wrapper = target.wrapper; 
       switch (action.type) {
       case ActionType.Launch:
         if (!target.preexisting) {
-          this.log.debug("invoke Launch, which means do nothing if wrapper found: "+wrapper);
           break;
         } //else fall-through
       case ActionType.Message:
@@ -585,8 +603,19 @@ export class Dispatcher implements ZLUX.Dispatcher {
         }
         break;
       case ActionType.Minimize:
+          if (targetId && this.windowManager) {
+             this.windowManager.minimize(targetId);
+          }else {
+           this.log.warn('Target ID not provided or windowManager not initialized');
+          }
+          break;
       case ActionType.Maximize:
-        this.log.warn('Max/Min not supported at this time. Concern if apps should be able to control other apps visibility.');
+          if (targetId && this.windowManager) {
+             this.windowManager.maximize(targetId);
+          }else {
+             this.log.warn('Target ID not provided or windowManager not initialized');
+          }
+          break;
       default:
         this.log.warn("Unhandled action type = "+action.type);
       };
@@ -771,7 +800,16 @@ export class Dispatcher implements ZLUX.Dispatcher {
           });
           break;
       }
+    } 
+  }
+  
+  attachWindowManager(windowManager:any): boolean{
+    if (!this.windowManager) {
+       this.windowManager = windowManager;
+       return true;
     }
+    this.log.warn('windowManager has already been initialized');
+    return false;
   }
 }
 
