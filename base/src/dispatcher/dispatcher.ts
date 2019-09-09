@@ -493,6 +493,11 @@ export class Dispatcher implements ZLUX.Dispatcher {
    }
 
    buildObjectFromTemplate(template:any, eventContext:any):any{
+      if (!template) {
+        this.log.debug('no template provided, returning argument "as is"', eventContext);
+        return eventContext;
+      }
+
       let outputObject:any = Array.isArray(template) ? [] : {};
       let dispatcher:Dispatcher = this;
       for (let propName in template){
