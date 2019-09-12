@@ -17,8 +17,10 @@ export class ZoweNotification {
   private plugin: string;
   private config: any;
   private title: string;
+  private id: number;
 
-  constructor(title: string, message: string, type: MVDHosting.ZoweNotificationType, plugin: string, config?: any) {
+  constructor(id: number, title: string, message: string, type: MVDHosting.ZoweNotificationType, plugin: string, config?: any) {
+    this.id = id;
     this.title = title;
     this.message = message;
     this.type = type;
@@ -50,7 +52,11 @@ export class ZoweNotification {
   }
 
   getConfig(): any {
-    return this.config
+    return this.config;
+  }
+
+  getId(): any {
+    return this.id;
   }
 }
 
