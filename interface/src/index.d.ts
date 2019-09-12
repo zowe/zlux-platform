@@ -36,11 +36,19 @@ declare namespace ZLUX {
     addRecognizer(predicate: RecognitionClause, actionID: string): void;
     registerAction(action: Action): void;
     getAction(recognizer: any): Action | undefined;
-    invokeAction(action: Action, eventContext: any): any;
+    addPendingIframe(plugin:ZLUX.Plugin, launchMetadata: any): void;
+    callInstance(eventName: string, appInstanceId:string, data: Object): Promise<any>;
+    callAny(eventName: string, pluginId:string, data: Object): Promise<any>;
+    callAll(eventName: string, pluginId:string, data: Object, failOnError: boolean): Promise<any>;
+    callEveryone(eventName: string, data: Object, failOnError: boolean): Promise<any>;
+    registerEventListener(eventName: string, callback: EventListenerOrEventListenerObject | null, appId: string): void;
+    deregisterEventListener(eventName: string, callback: EventListenerOrEventListenerObject | null, appId: string, pluginId:string): void;
+    invokeAction(action: Action, eventContext: any, targetId?: number): any;
     makeAction(id: string, defaultName: string, targetMode: ActionTargetMode, type: ActionType, targetPluginID: string, primaryArgument: any): Action;
     registerApplicationCallbacks(plugin: Plugin, applicationInstanceId: any, callbacks: ApplicationCallbacks): void;
     clear(): void;
     iframeLoaded(instanceId: MVDHosting.InstanceId, identifier: string);
+    attachWindowManager(windowManager: any);
     constants: DispatcherConstants;
   }
 
@@ -110,7 +118,7 @@ declare namespace ZLUX {
   }
 
   interface Logger {
-    makeComponentLogger(componentName: string): ComponentLogger;
+    makeComponentLogger(componentName: string, messages?: any): ComponentLogger;
     setLogLevelForComponentName(componentName: string, level: number): void;
   }
 
@@ -136,7 +144,7 @@ declare namespace ZLUX {
   interface UriBroker {
     desktopRootUri(): string;
     datasetMetadataHlqUri(updateCache?: boolean, types?: string, workAreaSize?: number, resumeName?: string, resumeCatalogName?: string): string;
-    datasetMetadataUri(dsn: string, detail?: string, types?: string, listMembers?: boolean, workAreaSize?: number, includeMigrated?: boolean, includeUnprintable?: boolean, resumeName?: string, resumeCatalogName?: string): string;
+    datasetMetadataUri(dsn: string, detail?: string, types?: string, listMembers?: boolean, workAreaSize?: number, includeMigrated?: boolean, includeUnprintable?: boolean, resumeName?: string, resumeCatalogName?: string, addQualifiers?: string): string;
     datasetContentsUri(dsn: string): string;
     VSAMdatasetContentsUri(dsn: string, closeAfter?: boolean): string;
     /*TODO: for breaking change, we need to change this into a passed object so that its way cleaner and
