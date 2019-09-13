@@ -15,16 +15,14 @@ let urlSet: boolean = false;
 
 export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManagerInterface {
   public notificationCache: any[];
-  public notificationCache2: any[];
   private handlers: MVDHosting.ZoweNotificationWatcher[];
   private restUrl: string;
-  public idCount2: number;
+  public idCount: number;
 
   constructor() {
     this.notificationCache = new Array<ZoweNotification>();
-    this.notificationCache2 = new Array<ZoweNotification>();
     this.handlers = new Array<MVDHosting.ZoweNotificationWatcher>();
-    this.idCount2 = 0;
+    this.idCount = 0;
   }
 
   _setURL(wsUrl: string, restUrl: string): void {
@@ -33,7 +31,6 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
       let ws = new WebSocket(wsUrl);
       var _this = this;
       ws.onmessage = function(message) {
-        _this.notificationCache.push((JSON.parse(message.data)['notification']) as ZoweNotification)
         _this.updateHandlers(JSON.parse(message.data)['notification']);
       }
       ws.onclose = () => {
@@ -47,9 +44,9 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
   }
 
   updateHandlers(message: any): void {
-    let notif = {'id': this.idCount2, 'notification': message}
-    this.notificationCache2.push(notif);
-    this.idCount2 = this.idCount2 + 1; 
+    let notif = {'id': this.idCount, 'notification': message}
+    this.notificationCache.push(notif);
+    this.idCount = this.idCount + 1; 
     for (let i = 0; i < this.handlers.length; i++) {
       this.handlers[i].handleMessageAdded(notif);
     }
