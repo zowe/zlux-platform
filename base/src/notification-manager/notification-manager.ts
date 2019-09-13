@@ -76,35 +76,6 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
     }
   }
 
-  getAll(): ZoweNotification[] {
-    let copy: ZoweNotification[] = this.notificationCache.slice(0);
-
-    /* NgFor is going from first element. We need to start from the end to show the most recent notifications first.
-    It would make more sense to just pop all elements from notification cache, but if we closed the app, they'd all be gone.
-    */
-    copy.reverse();
-
-    return copy;
-  }
-
-  getAllByCategory(type: MVDHosting.ZoweNotificationType): ZoweNotification[] {
-    var filtered: ZoweNotification[] = [];
-    var i: number;
-
-    for (i = 0; i < this.notificationCache.length; i++) {
-      if (this.notificationCache[i].getType() === type) {
-        filtered.push(this.notificationCache[i]);
-      }
-    }
-
-    /* NgFor is going from first element. We need to start from the end to show the most recent notifications first.
-    It would make more sense to just pop all elements from notification cache, but if we closed the app, they'd all be gone.
-    */
-    filtered.reverse();
-
-    return filtered;
-  }
-
   removeAll(): void {
     this.notificationCache.length = 0;
   }

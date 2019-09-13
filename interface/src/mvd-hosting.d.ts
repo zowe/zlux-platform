@@ -94,8 +94,6 @@ declare namespace MVDHosting {
     serverNotify(message: any): void;
     updateHandlers(message: any): void;
     dismissNotification(id: number): void;
-    getAll(): ZoweNotification[] | void;
-    getAllByCategory(type: MVDHosting.ZoweNotificationType): ZoweNotification[] | void;
     getCount(): number;
     removeAll(): void;
     addMessageHandler(object: ZoweNotificationWatcher): void;
