@@ -90,11 +90,10 @@ declare namespace MVDHosting {
   }
 
   export interface ZoweNotificationManagerInterface {
-    createNotification(title: string, message: string, type: number, plugin: string, config?: any): ZoweNotification;
     notify(notification: ZoweNotification): number;
     serverNotify(message: any): void;
     updateHandlers(message: any): void;
-    dismissNotification(index: number): void;
+    dismissNotification(id: number): void;
     getAll(): ZoweNotification[] | void;
     getAllByCategory(type: MVDHosting.ZoweNotificationType): ZoweNotification[] | void;
     getCount(): number;
@@ -104,7 +103,7 @@ declare namespace MVDHosting {
   }
 
   export interface ZoweNotificationWatcher {
-    handleMessageAdded(data: any, index: number): void;
+    handleMessageAdded(test: any): void;
     handleMessageRemoved(id: number): void;
   }
 }

@@ -15,14 +15,16 @@ let urlSet: boolean = false;
 
 export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManagerInterface {
   public notificationCache: any[];
+  public notificationCache2: any[];
   private handlers: MVDHosting.ZoweNotificationWatcher[];
   private restUrl: string;
-  public idCount: number;
+  public idCount2: number;
 
   constructor() {
     this.notificationCache = new Array<ZoweNotification>();
+    this.notificationCache2 = new Array<ZoweNotification>();
     this.handlers = new Array<MVDHosting.ZoweNotificationWatcher>();
-    this.idCount = 0;
+    this.idCount2 = 0;
   }
 
   _setURL(wsUrl: string, restUrl: string): void {
@@ -44,15 +46,12 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
     }
   }
 
-  createNotification(title: string, message: string, type: number, plugin: string, config?: any): ZoweNotification {
-    let notification = new ZoweNotification(this.idCount, title, message, type, plugin, config)
-    this.idCount = this.idCount + 1;
-    return notification;
-  }
-
   updateHandlers(message: any): void {
+    let notif = {'id': this.idCount2, 'notification': message}
+    this.notificationCache2.push(notif);
+    this.idCount2 = this.idCount2 + 1; 
     for (let i = 0; i < this.handlers.length; i++) {
-      this.handlers[i].handleMessageAdded(message, this.notificationCache.length -1);
+      this.handlers[i].handleMessageAdded(notif);
     }
   }
 
