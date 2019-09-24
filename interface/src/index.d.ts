@@ -191,7 +191,8 @@ declare namespace ZLUX {
 
   const enum PluginType {
     Desktop = "desktop",
-    Application = "application"
+    Application = "application",
+    Bootstrap = "bootstrap"
   }
 
   interface Plugin {

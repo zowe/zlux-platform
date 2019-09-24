@@ -21,7 +21,7 @@ declare namespace MVDHosting {
     AuthenticationManagerToken = "com.rs.mvd.hosting.authentication-manager"
   }
 
-  export const enum NotificationType {
+  export const enum ZoweNotificationType {
     System = 1,
     Application = 2
   }
@@ -89,17 +89,20 @@ declare namespace MVDHosting {
     performLogin(username: string, password: string): Observable<Response>;
   }
 
-  export interface NotificationManagerInterface {
-    push(notification: Notification): void;
-    pop(): Notification | void;
-    getAll(): Notification[] | void;
-    getAllByCategory(type: MVDHosting.NotificationType): Notification[] | void;
+  export interface ZoweNotificationManagerInterface {
+    notify(notification: ZoweNotification): number;
+    serverNotify(message: any): void;
+    updateHandlers(message: any): void;
+    dismissNotification(id: number): void;
     getCount(): number;
-    addMessageHandler(object: NotificationWatcher): void;
+    removeAll(): void;
+    addMessageHandler(object: ZoweNotificationWatcher): void;
+    removeMessageHandler(object: ZoweNotificationWatcher): void;
   }
 
-  export interface NotificationWatcher {
-    handleMessageAdded(): void;
+  export interface ZoweNotificationWatcher {
+    handleMessageAdded(test: any): void;
+    handleMessageRemoved(id: number): void;
   }
 }
 
