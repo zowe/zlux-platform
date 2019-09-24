@@ -492,8 +492,13 @@ export class Dispatcher implements ZLUX.Dispatcher {
      }
    }
 
+   isEmpty(obj: any): boolean {
+     const isEmptyObj: boolean = (!obj) || (Object.keys(obj).length == 0);
+     return isEmptyObj;
+   }
+
    buildObjectFromTemplate(template:any, eventContext:any):any{
-      if (!template) {
+      if (!template || this.isEmpty(template)) {
         this.log.debug('no template provided, returning argument "as is"', eventContext);
         return eventContext;
       }
@@ -962,34 +967,54 @@ export enum ActionType {       // not all actions are meaningful for all target 
 } 
   
 
-export class Action implements ZLUX.Action {
+export class AbstractAction implements ZLUX.AbstractAction {
     id: string;           // id of action itself.
     i18nNameKey: string;  // future proofing for I18N
     defaultName: string;  // default name for display purposes, w/o I18N
     description: string;
-    targetMode: ActionTargetMode;
-    type: ActionType;   // "launch", "message"
-    targetPluginID: string;
-    primaryArgument: any;
 
     constructor(id: string, 
-                defaultName: string,
-                targetMode: ActionTargetMode, 
-                type: ActionType,
-                targetPluginID: string,
-                primaryArgument:any) {
+                defaultName: string) {
        this.id = id;
        this.defaultName = defaultName;
        // proper name for ID/tye
-       this.targetPluginID = targetPluginID; 
-       this.targetMode = targetMode;
-       this.type = type;
-       this.primaryArgument = primaryArgument;
     }
 
     getDefaultName():string {
       return this.defaultName;
     }
+
+    getId(): string {
+      return this.id;
+    }
+}
+
+export class Action extends AbstractAction implements ZLUX.Action {
+  targetMode: ActionTargetMode;
+  type: ActionType;   // "launch", "message"
+  targetPluginID: string;
+  primaryArgument?: any;
+
+  constructor(id: string,
+              defaultName: string,
+              targetMode: ActionTargetMode,
+              type: ActionType,
+              targetPluginID: string,
+              primaryArgument?: any) {
+    super(id, defaultName);
+    this.targetPluginID = targetPluginID;
+    this.targetMode = targetMode;
+    this.type = type;
+    this.primaryArgument = primaryArgument;
+  }
+}
+
+export class Actioncontainer extends AbstractAction implements ZLUX.ActionContainer {
+  children: ZLUX.AbstractAction[];
+
+  getChildren(): ZLUX.AbstractAction[] {
+    return this.children
+  }
 }
 
 

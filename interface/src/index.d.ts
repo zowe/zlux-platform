@@ -107,8 +107,20 @@ declare namespace ZLUX {
     ActionType: any
   }
 
-  interface Action {
+  interface AbstractAction {
+    getId(): string;
     getDefaultName(): string;
+  }
+
+  interface Action extends AbstractAction {
+  }
+
+  interface ActionReference {
+    targetActionId: string;
+  }
+
+  interface ActionContainer extends AbstractAction {
+    getChildren(): (AbstractAction | ActionReference)[];
   }
 
   interface ComponentLogger {
