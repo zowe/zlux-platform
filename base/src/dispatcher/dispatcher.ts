@@ -74,7 +74,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
    private pendingIframes: Map<string,IframeContext[]> = new Map();
    private instancesForTypes : Map<string,ApplicationInstanceWrapper[]> = new Map();
    private recognizers:RecognitionRule[] = [];
-   private actionsByID :Map<string,Action> = new Map();
+   private actionsByID :Map<string,AbstractAction> = new Map();
    private indexedRecognizers :Map<String,RecognizerIndex> = new Map();
    launchCallback: any = null;
    private pluginWatchers: Map<String,Array<ZLUX.PluginWatcher>> = new Map();
@@ -243,13 +243,13 @@ export class Dispatcher implements ZLUX.Dispatcher {
      }
    }
 
-   getRecognizersForCapabilities(capabilities: string[], tuple: any) {
-     const recognizersForCapabilities: RecognitionRule[] = this.getRecognizersForCapabilitiesInternal(capabilities);
+   private getRecognizersForCapabilities(capabilities: string[] | null, applicationContext: any) {
+     const recognizersForCapabilities: RecognitionRule[] = this.getAllRecognizersForCapabilities(capabilities);
 
-     return this.getRecognizersInternal(recognizersForCapabilities, tuple);
+     return this.getRecognizersInternal(recognizersForCapabilities, applicationContext);
    }
 
-   getRecognizersForCapabilitiesInternal(capabilities: string[]):RecognitionRule[] {
+   private getAllRecognizersForCapabilities(capabilities: string[] | null):RecognitionRule[] {
      if (!(capabilities && capabilities.length > 0)) {
        return this.recognizers;
      } else {
@@ -264,32 +264,36 @@ export class Dispatcher implements ZLUX.Dispatcher {
      }
    }
 
-   getRecognizers(tuple:any):RecognitionRule[] {
-     return this.getRecognizersInternal(this.recognizers, tuple);
+   /**
+    * @deprecated Use getActions instead
+    * @param applicationContext 
+    */
+   getRecognizers(applicationContext:any):RecognitionRule[] {
+     return this.getRecognizersInternal(this.recognizers, applicationContext);
    }
 
-   getRecognizersInternal(recognizerSet: RecognitionRule[], tuple: any):RecognitionRule[] {
+   getRecognizersInternal(recognizerSet: RecognitionRule[], applicationContext: any):RecognitionRule[] {
      let matchedRecognizers:any[] = [];
      // we can get the set of recognizers that match on this property at top clause
      // and those that don't, too.
      // PropertyRecognizers  table of propName-> ( tableOfRecognizersPerValue, otherRecognizers)
-     // if tuple has a prop
+     // if applicationContext has a prop
      //   prop indexed
      //     get recognizers per value, or none
      //   prop not indexed
      //     use all recognizer list
-     // need iteration on propertyNames for tuple
+     // need iteration on propertyNames for applicationContext
      // 
-     this.log.debug("getRecognizers"+JSON.stringify(tuple));
-     for (let propertyName in tuple){
+     this.log.debug("getRecognizers",applicationContext);
+     for (let propertyName in applicationContext){
        let recognizerIndex:RecognizerIndex|undefined = this.indexedRecognizers.get(propertyName);
        this.log.debug("recognizerIndex="+recognizerIndex);
        if (recognizerIndex){
-         let ruleArray:RecognitionRule[]|undefined = recognizerIndex.valueMap.get(tuple[propertyName]);
+         let ruleArray:RecognitionRule[]|undefined = recognizerIndex.valueMap.get(applicationContext[propertyName]);
          this.log.debug("ruleArray="+ruleArray);
          if (ruleArray){
            for (let rule of ruleArray){
-             if (rule.predicate.match(tuple)){
+             if (rule.predicate.match(applicationContext)){
                matchedRecognizers.push(rule);
              }
            }
@@ -298,7 +302,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
        }
      } 
      recognizerSet.forEach( (recognizer:RecognitionRule) => {
-       if (recognizer.predicate.match(tuple)){
+       if (recognizer.predicate.match(applicationContext)){
          matchedRecognizers.push(recognizer);
        }
      });
@@ -363,7 +367,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
            this.log.debug("addRecognizer recognizersForIndex="+recognizerIndex);
            // here - fix me
            // test server/client
-           // filter crap - are the screen ID's broken??  - should be no screen ID in tuple on first page
+           // filter crap - are the screen ID's broken??  - should be no screen ID in applicationContext on first page
            // why not getting 5 things?
            if (recognizerIndex){
              let ruleArray:RecognitionRule[]|undefined = recognizerIndex.valueMap.get(propertyValue); 
@@ -407,15 +411,96 @@ export class Dispatcher implements ZLUX.Dispatcher {
     
 
 /* what will callback be called with */
-  registerAction(action: Action):void {
-      this.actionsByID.set(action.id,action);
-   }
+  registerAction(action: AbstractAction): void {
+    const { id } = action;
+    const existingAction: AbstractAction | undefined = this.actionsByID.get(id);
 
+    if (existingAction) {
+      this.log.warn(`duplicate actionId ${id}. Replacing`, existingAction, 'with', action);
+    }
 
-   getAction(recognizer:any):Action|undefined {
+    this.actionsByID.set(action.id, action);
+
+    if (action instanceof ActionContainer) {
+      const { children } = action as ActionContainer;
+
+      if (children && children.length > 0) {
+        for (let child of children) {
+          if (child instanceof AbstractAction) {
+            this.registerAction(child);
+          }
+        }
+      }
+    }
+  }
+
+   getAction(recognizer:any):AbstractAction|undefined {
      this.log.debug("actionName "+JSON.stringify(recognizer)+" in "+JSON.stringify(this.actionsByID));
-     return this.actionsByID.get(recognizer.actionID);
+     return this.getActionById(recognizer.actionID);
    }
+
+   getActionById(actionId: string): AbstractAction|undefined {
+     return this.actionsByID.get(actionId);
+   }
+
+  getActions(capabilities: string[] | null, applicationContext: any): ZLUX.ActionLookupResult {
+    const actions: AbstractAction[] = [];
+    const recognizers: RecognitionRule[] = this.getRecognizersForCapabilities(capabilities, applicationContext);
+    const unresolvedActionIds: string[] = [];
+
+    if (recognizers) {
+      for (let recognizer of recognizers) {
+        const action: AbstractAction | undefined = this.getAction(recognizer);
+
+        if (action) {
+          if (action instanceof ActionContainer) {
+            this.resolveActionReferences(action as ActionContainer, unresolvedActionIds);
+          }
+
+          actions.push(action);
+        } else {
+          unresolvedActionIds.push(recognizer.actionID);
+        }
+      }
+    }
+
+    return {
+      actions: actions.length > 0 ? actions : undefined,
+      unresolvedActionIds: unresolvedActionIds.length > 0 ? unresolvedActionIds : undefined
+    };
+  }
+
+  /**
+   * WARNING: recursively modifies the children references
+   * @param actionContainer 
+   */
+  private resolveActionReferences(actionContainer: ActionContainer, unresolvedActionIds: string[]): void {
+    const children: (ZLUX.AbstractAction | ZLUX.ActionReference)[] = actionContainer.children;
+    const resolvedChildren: ZLUX.AbstractAction[] = [];
+
+    if (children) {
+      for (let i: number = 0; i < children.length; i++) {
+        const child = children[i];
+
+        if (child instanceof Action) {
+          resolvedChildren.push(child as ZLUX.AbstractAction);
+        } else if (child instanceof ActionContainer) {
+          this.resolveActionReferences(child as ActionContainer, unresolvedActionIds);
+          resolvedChildren.push(child as ZLUX.AbstractAction);
+        } else { // must be a ZLUX.ActionReference
+          const actionId: string = (child as ZLUX.ActionReference).targetActionId;
+          const action = this.getActionById(actionId);
+
+          if (action) {
+            resolvedChildren.push(action)
+          } else {
+            unresolvedActionIds.push(actionId);
+          }
+        }
+      }
+      actionContainer.children = resolvedChildren;
+    }
+  }
 
    static isAtomicType(specType:string):boolean{
      return ((specType === "boolean") ||
@@ -527,9 +612,59 @@ export class Dispatcher implements ZLUX.Dispatcher {
       return outputObject;
    }        
 
-   makeAction(id: string, defaultName: string, targetMode: ActionTargetMode, type: ActionType, targetPluginID: string, primaryArgument: any):Action{
-     return new Action(id,defaultName,targetMode,type,targetPluginID,primaryArgument);
-   }
+  makeActionFromObject(actionObject: ZLUX.AbstractAction): AbstractAction {
+    const { id, objectType, defaultName } = actionObject;
+    switch (objectType as any) {
+      case "ActionContainer":
+        const container = new ActionContainer(id, defaultName);
+        const actionObjectAsContainer: ZLUX.ActionContainer = actionObject as ZLUX.ActionContainer;
+        const childrenIn: (ZLUX.AbstractAction | ZLUX.ActionReference)[] = actionObjectAsContainer.children;
+        const children: (ZLUX.AbstractAction | ZLUX.ActionReference)[] = [];
+
+        if (childrenIn && childrenIn.length > 0) {
+          for (let childIn of childrenIn) {
+            let child: ZLUX.AbstractAction | ZLUX.ActionReference;
+            if (childIn.hasOwnProperty('targetActionId')) {
+              child = childIn as ZLUX.ActionReference;
+            } else {
+              child = this.makeActionFromObject(childIn as ZLUX.AbstractAction);
+              this.registerAction(child as AbstractAction);
+            }
+            children.push(child);
+          }
+          container.children = children;
+        }
+
+        return container;
+
+      default:
+        const actionAsAny: any = actionObject as any;
+        let { targetMode, type, targetPluginID, primaryArgument } = actionAsAny;
+        // backward compatbility: some "legacy" actions could have a "mode" field instead of a "targetMode" field, or a targetId field instead of a targetPluginID
+        if (targetMode === undefined || targetMode === null) {
+          targetMode = actionAsAny.mode;
+        }
+        if (!targetPluginID) {
+          targetPluginID = actionAsAny.targetId;
+        }
+        return new Action(id, defaultName, targetMode, type, targetPluginID, primaryArgument);
+    }
+
+  }
+
+  makeAction(id: string, defaultName: string, targetMode: ActionTargetMode, type: ActionType, targetPluginID: string, primaryArgument: any, objectType?: string): AbstractAction {
+    const actionObject: any = {
+      id,
+      defaultName,
+      targetMode,
+      type,
+      targetPluginID,
+      primaryArgument,
+      objectType
+    };
+
+    return this.makeActionFromObject(actionObject as ZLUX.AbstractAction);
+  }
   
   private getAppInstanceWrapper(plugin:ZLUX.Plugin, id:MVDHosting.InstanceId) :ApplicationInstanceWrapper|null{
     let wrappers:ApplicationInstanceWrapper[]|undefined = this.instancesForTypes.get(plugin.getKey());
@@ -897,8 +1032,8 @@ export class RecognitionClause{
     this.operation = op;
   }
 
-  match(tuple:any):boolean{
-     tuple;  // shuddup
+  match(applicationContext:any):boolean{
+     applicationContext;  // shuddup
      return false;
   }
 }
@@ -909,9 +1044,9 @@ export class RecognizerAnd extends RecognitionClause {
     this.subClauses = conjuncts;
   } 
   
-  match(tuple:any):boolean{
+  match(applicationContext:any):boolean{
     for (let subClause of this.subClauses){
-      if (!(subClause as RecognitionClause).match(tuple)){
+      if (!(subClause as RecognitionClause).match(applicationContext)){
         return false;
       }
     }
@@ -925,9 +1060,9 @@ export class RecognizerOr extends RecognitionClause {
     this.subClauses = disjuncts;
   } 
 
-  match(tuple:any):boolean{
+  match(applicationContext:any):boolean{
     for (let subClause of this.subClauses){
-      if ((subClause as RecognitionClause).match(tuple)){
+      if ((subClause as RecognitionClause).match(applicationContext)){
         return true;
       }
     }
@@ -942,8 +1077,8 @@ export class RecognizerProperty extends RecognitionClause {
     this.subClauses[1] = propertyValue;
   }
 
-  match(tuple:any):boolean{
-    return tuple[this.subClauses[0] as string] == this.subClauses[1];
+  match(applicationContext:any):boolean{
+    return applicationContext[this.subClauses[0] as string] == this.subClauses[1];
   }
 }
 
@@ -1009,10 +1144,10 @@ export class Action extends AbstractAction implements ZLUX.Action {
   }
 }
 
-export class Actioncontainer extends AbstractAction implements ZLUX.ActionContainer {
-  children: ZLUX.AbstractAction[];
+export class ActionContainer extends AbstractAction implements ZLUX.ActionContainer {
+  children: (ZLUX.AbstractAction | ZLUX.ActionReference)[];
 
-  getChildren(): ZLUX.AbstractAction[] {
+  getChildren(): (ZLUX.AbstractAction | ZLUX.ActionReference)[] {
     return this.children
   }
 }
