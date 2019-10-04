@@ -98,6 +98,7 @@ declare namespace MVDHosting {
     removeAll(): void;
     addMessageHandler(object: ZoweNotificationWatcher): void;
     removeMessageHandler(object: ZoweNotificationWatcher): void;
+    createNotification(title: string, message: string, type :ZoweNotificationType, pluginId :string): void;
   }
 
   export interface ZoweNotificationWatcher {
