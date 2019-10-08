@@ -40,6 +40,10 @@ export class PluginManager {
     }
   }
 
+  static clearPlugins(): void {
+    PluginManager.pluginsById.clear();
+  }
+
   static getPlugin(id:string):ZLUX.Plugin|undefined {
     return PluginManager.pluginsById.get(id);
   }
