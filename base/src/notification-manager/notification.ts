@@ -24,7 +24,7 @@ export class ZoweNotification {
     this.type = type;
     this.date = new Date();
     this.plugin = plugin;
-    if (this.styleClass) {
+    if (styleClass) {
       this.styleClass = styleClass;
     } else {
       this.styleClass = defaultStyleClass;
