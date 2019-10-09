@@ -12,7 +12,7 @@
 
 import { Plugin } from './plugin'
 
-export class PluginManager implements MVDHosting.LogoutActionInterface {
+export class PluginManager {
   private static desktopPlugin: Plugin | null = null;
   private static pluginsById:Map<string,ZLUX.Plugin> = new Map();
 
@@ -38,15 +38,6 @@ export class PluginManager implements MVDHosting.LogoutActionInterface {
     } else {
       throw new Error("Unable to parse plugin definitions: Missing field 'pluginDefinitions'");
     }
-  }
-
-  onLogout(): boolean {
-    PluginManager.pluginsById.clear();
-    return true;
-  }
-
-  static clearPlugins(): void {
-    PluginManager.pluginsById.clear();
   }
 
   static getPlugin(id:string):ZLUX.Plugin|undefined {
