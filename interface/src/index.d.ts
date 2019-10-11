@@ -125,8 +125,8 @@ declare namespace ZLUX {
   interface Globalization {
     getLanguage(): string;
     getLocale(): string;
-    setLanguage(language: string): Promise<any>;
-    setLocale(locale: string): Promise<any>;
+    setLanguage(language: string): any;
+    setLocale(locale: string): any;
   }
 
   type UnixFileUriOptions = {
