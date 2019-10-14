@@ -47,9 +47,11 @@ declare namespace ZLUX {
     addRecognizerFromObject(predicateObject:RecognitionObjectPropClause | RecognitionObjectOpClause, actionID:string, capabilities?: string[]):void;
     addRecognizerObject(recoginzerObject: ZLUX.RecognizerObject): void;
     addRecognizer(predicate: RecognitionClause, actionID: string): void;
-    registerAction(action: AbstractAction): void;
+    registerAction(action: Action): void;
     getAction(recognizer: any): Action | undefined;
-    getActions(capabilities: string[], applicationContext: any): ActionLookupResult;
+    registerAbstractAction(action: AbstractAction): void;
+    getAbstractActionById(actionId: string): AbstractAction | undefined;
+    getAbstractActions(capabilities: string[], applicationContext: any): ActionLookupResult;
     addPendingIframe(plugin:ZLUX.Plugin, launchMetadata: any): void;
     callInstance(eventName: string, appInstanceId:string, data: Object): Promise<any>;
     callAny(eventName: string, pluginId:string, data: Object): Promise<any>;
@@ -58,7 +60,7 @@ declare namespace ZLUX {
     registerEventListener(eventName: string, callback: EventListenerOrEventListenerObject | null, appId: string): void;
     deregisterEventListener(eventName: string, callback: EventListenerOrEventListenerObject | null, appId: string, pluginId:string): void;
     invokeAction(action: Action, eventContext: any, targetId?: number): any;
-    makeAction(id: string, defaultName: string, targetMode: ActionTargetMode, type: ActionType, targetPluginID: string, primaryArgument: any): AbstractAction;
+    makeAction(id: string, defaultName: string, targetMode: ActionTargetMode, type: ActionType, targetPluginID: string, primaryArgument: any): Action;
     makeActionFromObject(action: AbstractAction): AbstractAction;
     registerApplicationCallbacks(plugin: Plugin, applicationInstanceId: any, callbacks: ApplicationCallbacks): void;
     clear(): void;
@@ -136,6 +138,9 @@ declare namespace ZLUX {
   }
 
   interface Action extends AbstractAction {
+    targetPluginID: string;
+    type: ActionType;
+    targetMode: ActionTargetMode;
   }
 
   interface ActionReference {

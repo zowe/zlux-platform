@@ -74,7 +74,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
    private pendingIframes: Map<string,IframeContext[]> = new Map();
    private instancesForTypes : Map<string,ApplicationInstanceWrapper[]> = new Map();
    private recognizers:RecognitionRule[] = [];
-   private actionsByID :Map<string,AbstractAction> = new Map();
+   private actionsByID :Map<string,ZLUX.AbstractAction> = new Map();
    private indexedRecognizers :Map<String,RecognizerIndex> = new Map();
    launchCallback: any = null;
    private pluginWatchers: Map<String,Array<ZLUX.PluginWatcher>> = new Map();
@@ -409,11 +409,18 @@ export class Dispatcher implements ZLUX.Dispatcher {
     }
   }
     
+  private isConcreteAction(action: ZLUX.AbstractAction | undefined): boolean {
+    const actionAsAny: any = action as any;
+    return actionAsAny && actionAsAny.targetPluginID && actionAsAny.type && actionAsAny.targetMode;
+  }
 
-/* what will callback be called with */
-  registerAction(action: AbstractAction): void {
+  registerAction(action: ZLUX.Action): void {
+    this.registerAbstractAction(action);
+  }
+
+  registerAbstractAction(action: ZLUX.AbstractAction): void {
     const { id } = action;
-    const existingAction: AbstractAction | undefined = this.actionsByID.get(id);
+    const existingAction: ZLUX.AbstractAction | undefined = this.actionsByID.get(id);
 
     if (existingAction) {
       this.log.warn(`duplicate actionId ${id}. Replacing`, existingAction, 'with', action);
@@ -427,30 +434,43 @@ export class Dispatcher implements ZLUX.Dispatcher {
       if (children && children.length > 0) {
         for (let child of children) {
           if (child instanceof AbstractAction) {
-            this.registerAction(child);
+            this.registerAbstractAction(child);
           }
         }
       }
     }
   }
 
-   getAction(recognizer:any):AbstractAction|undefined {
-     this.log.debug("actionName "+JSON.stringify(recognizer)+" in "+JSON.stringify(this.actionsByID));
-     return this.getActionById(recognizer.actionID);
-   }
+  /**
+   * Legacy method.
+   * @param recognizer 
+   * @returns the action referenced by recognizer.actionID if and only if it is a concrete ZLUX.Action, undefined otherwise
+   * @deprecated. Use getAbstractActions instead.
+   */
+  getAction(recognizer:any): ZLUX.Action|undefined {
+    this.log.debug("actionName "+JSON.stringify(recognizer)+" in "+JSON.stringify(this.actionsByID));
+    const abstractAction: ZLUX.AbstractAction | undefined = this.getAbstractActionById(recognizer.actionID);
 
-   getActionById(actionId: string): AbstractAction|undefined {
+    if (this.isConcreteAction(abstractAction)) {
+      return abstractAction as ZLUX.Action;
+    } else {
+      this.log.warn(`recognizer referenced actionID ${recognizer.actionID}, which did not return a concrete action. Found: `, abstractAction);
+      return undefined;
+    }
+  }
+
+   getAbstractActionById(actionId: string): ZLUX.AbstractAction|undefined {
      return this.actionsByID.get(actionId);
    }
 
-  getActions(capabilities: string[] | null, applicationContext: any): ZLUX.ActionLookupResult {
-    const actions: AbstractAction[] = [];
+  getAbstractActions(capabilities: string[] | null, applicationContext: any): ZLUX.ActionLookupResult {
+    const actions: ZLUX.AbstractAction[] = [];
     const recognizers: RecognitionRule[] = this.getRecognizersForCapabilities(capabilities, applicationContext);
     const unresolvedActionIds: string[] = [];
 
     if (recognizers) {
       for (let recognizer of recognizers) {
-        const action: AbstractAction | undefined = this.getAction(recognizer);
+        const action: ZLUX.AbstractAction | undefined = this.getAction(recognizer);
 
         if (action) {
           if (action instanceof ActionContainer) {
@@ -489,7 +509,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
           resolvedChildren.push(child as ZLUX.AbstractAction);
         } else { // must be a ZLUX.ActionReference
           const actionId: string = (child as ZLUX.ActionReference).targetActionId;
-          const action = this.getActionById(actionId);
+          const action = this.getAbstractActionById(actionId);
 
           if (action) {
             resolvedChildren.push(action)
@@ -612,7 +632,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
       return outputObject;
    }        
 
-  makeActionFromObject(actionObject: ZLUX.AbstractAction): AbstractAction {
+  makeActionFromObject(actionObject: ZLUX.AbstractAction): ZLUX.AbstractAction {
     const { id, objectType, defaultName } = actionObject;
     switch (objectType as any) {
       case "ActionContainer":
@@ -625,10 +645,11 @@ export class Dispatcher implements ZLUX.Dispatcher {
           for (let childIn of childrenIn) {
             let child: ZLUX.AbstractAction | ZLUX.ActionReference;
             if (childIn.hasOwnProperty('targetActionId')) {
+              // NOTE: action references are resolved lazily (rather than being put on a delayed resolution queueu)
               child = childIn as ZLUX.ActionReference;
             } else {
               child = this.makeActionFromObject(childIn as ZLUX.AbstractAction);
-              this.registerAction(child as AbstractAction);
+              this.registerAbstractAction(child as ZLUX.AbstractAction);
             }
             children.push(child);
           }
@@ -652,7 +673,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
 
   }
 
-  makeAction(id: string, defaultName: string, targetMode: ActionTargetMode, type: ActionType, targetPluginID: string, primaryArgument: any, objectType?: string): AbstractAction {
+  makeAction(id: string, defaultName: string, targetMode: ActionTargetMode, type: ActionType, targetPluginID: string, primaryArgument: any, objectType?: string): ZLUX.Action {
     const actionObject: any = {
       id,
       defaultName,
@@ -663,7 +684,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
       objectType
     };
 
-    return this.makeActionFromObject(actionObject as ZLUX.AbstractAction);
+    return (this.makeActionFromObject(actionObject as ZLUX.AbstractAction) as ZLUX.Action);
   }
   
   private getAppInstanceWrapper(plugin:ZLUX.Plugin, id:MVDHosting.InstanceId) :ApplicationInstanceWrapper|null{
