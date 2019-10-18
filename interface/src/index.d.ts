@@ -31,11 +31,27 @@ declare namespace ZLUX {
     deregisterPluginInstance(plugin: Plugin, applicationInstanceId: any): void;
     setLaunchHandler(launchCallback: any): void;
     setPostMessageHandler(postMessageCallback: any): void;
-    getRecognizers(tuple: any): RecognitionRule[];
-    addRecognizerFromObject(predicateObject:RecognitionObjectPropClause | RecognitionObjectOpClause, actionID:string):void;
+    /**
+    * @deprecated Use getActions instead
+    * @see getActions
+    * @param applicationContext 
+    */
+    getRecognizers(applicationContext: any): RecognitionRule[];
+    /**
+     * @deprecated Use addRecognizerObject instead
+     * @see addRecognizerObject
+     * @param predicateObject 
+     * @param actionID 
+     * @param capabilities 
+     */
+    addRecognizerFromObject(predicateObject:RecognitionObjectPropClause | RecognitionObjectOpClause, actionID:string, capabilities?: string[]):void;
+    addRecognizerObject(recoginzerObject: ZLUX.RecognizerObject): void;
     addRecognizer(predicate: RecognitionClause, actionID: string): void;
     registerAction(action: Action): void;
     getAction(recognizer: any): Action | undefined;
+    registerAbstractAction(action: AbstractAction): void;
+    getAbstractActionById(actionId: string): AbstractAction | undefined;
+    getAbstractActions(capabilities: string[], applicationContext: any): ActionLookupResult;
     addPendingIframe(plugin:ZLUX.Plugin, launchMetadata: any): void;
     callInstance(eventName: string, appInstanceId:string, data: Object): Promise<any>;
     callAny(eventName: string, pluginId:string, data: Object): Promise<any>;
@@ -45,6 +61,7 @@ declare namespace ZLUX {
     deregisterEventListener(eventName: string, callback: EventListenerOrEventListenerObject | null, appId: string, pluginId:string): void;
     invokeAction(action: Action, eventContext: any, targetId?: number): any;
     makeAction(id: string, defaultName: string, targetMode: ActionTargetMode, type: ActionType, targetPluginID: string, primaryArgument: any): Action;
+    makeActionFromObject(action: AbstractAction): AbstractAction;
     registerApplicationCallbacks(plugin: Plugin, applicationInstanceId: any, callbacks: ApplicationCallbacks): void;
     clear(): void;
     iframeLoaded(instanceId: MVDHosting.InstanceId, identifier: string);
@@ -54,6 +71,7 @@ declare namespace ZLUX {
 
   type RecognizerObject = {
     id: string,
+    capabilities?: string[],
     clause: RecognitionObjectPropClause | RecognitionObjectOpClause
   }
 
@@ -104,8 +122,45 @@ declare namespace ZLUX {
     ActionType: any
   }
 
-  interface Action {
+  interface AbstractAction {
+    /**
+     * null implies "Action" for backwards-compatibility
+     */
+    objectType?: ActionObjectType;
+    id: string;
+    defaultName: string;
+    getId(): string;
     getDefaultName(): string;
+  }
+
+  enum ActionObjectType {
+    Action, ActionContainer
+  }
+
+  interface Action extends AbstractAction {
+    targetPluginID: string;
+    type: ActionType;
+    targetMode: ActionTargetMode;
+  }
+
+  interface ActionReference {
+    targetActionId: string;
+  }
+
+  interface ActionContainer extends AbstractAction {
+    children: (AbstractAction | ActionReference)[];
+    getChildren(): (AbstractAction | ActionReference)[];
+  }
+
+  interface ActionLookupResult {
+    actions?: AbstractAction[];
+    unresolvedActionIds?: string[];
+  }
+
+  interface DispatchMetaData  {
+    originatingActionId: string;
+    originaltingAppInstanceId: string;
+    applicationContext: any;
   }
 
   interface ComponentLogger {
