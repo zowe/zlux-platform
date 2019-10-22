@@ -163,7 +163,10 @@ export class Dispatcher implements ZLUX.Dispatcher {
     this.log.debug(`Dequeuing iframe data`);
     if (this.postMessageCallback) {
       const contexts = this.pendingIframes.get(identifier);
-      if (contexts && contexts.length > 0) {
+      if(!contexts){
+        this.log.debug(`Sending postmessage of type launch to ${identifier} instance=${instanceId}`);
+        this.postMessageCallback(instanceId,{dispatchType: 'launch', dispatchData: {launchMetadata: null, instanceId: instanceId}});
+      } else if (contexts.length > 0) {
         let context = contexts.shift();
         if (context) {
           this.log.debug(`Sending postmessage of type launch to ${identifier} instance=${instanceId}`,context.data);
@@ -171,7 +174,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
         }
       }
     }
-   }   
+  }
 
    deregisterPluginInstance(plugin: ZLUX.Plugin, applicationInstanceId: MVDHosting.InstanceId):void {
      this.log.info(`Dispatcher requested to deregister plugin ${plugin} with id ${applicationInstanceId}`);
