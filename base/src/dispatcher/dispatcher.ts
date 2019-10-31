@@ -163,15 +163,15 @@ export class Dispatcher implements ZLUX.Dispatcher {
     this.log.debug(`Dequeuing iframe data`);
     if (this.postMessageCallback) {
       const contexts = this.pendingIframes.get(identifier);
-      if(!contexts){
-        this.log.debug(`Sending postmessage of type launch to ${identifier} instance=${instanceId}`);
-        this.postMessageCallback(instanceId,{dispatchType: 'launch', dispatchData: {launchMetadata: null, instanceId: instanceId}});
-      } else if (contexts.length > 0) {
+      if (contexts && contexts.length > 0) {
         let context = contexts.shift();
         if (context) {
           this.log.debug(`Sending postmessage of type launch to ${identifier} instance=${instanceId}`,context.data);
           this.postMessageCallback(instanceId,{dispatchType: 'launch', dispatchData: {launchMetadata: context.data, instanceId: instanceId}});
         }
+      } else {
+        this.log.debug(`Sending postmessage of type launch to ${identifier} instance=${instanceId}`);
+        this.postMessageCallback(instanceId,{dispatchType: 'launch', dispatchData: {launchMetadata: null, instanceId: instanceId}});
       }
     }
   }
