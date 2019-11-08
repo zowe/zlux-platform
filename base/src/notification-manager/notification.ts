@@ -9,20 +9,26 @@
   Copyright Contributors to the Zowe Project.
 */
 
-
+const defaultStyleClass = "org_zowe_zlux_ng2desktop_snackbar";
 export class ZoweNotification {
   private message: string;
   private date: Date;
   private type: MVDHosting.ZoweNotificationType;
   private plugin: string;
   private title: string;
+  private styleClass?: string;
 
-  constructor(title: string, message: string, type: MVDHosting.ZoweNotificationType, plugin: string) {
+  constructor(title: string, message: string, type: MVDHosting.ZoweNotificationType, plugin: string, styleClass?: string) {
     this.title = title;
     this.message = message;
     this.type = type;
     this.date = new Date();
     this.plugin = plugin;
+    if (styleClass) {
+      this.styleClass = styleClass;
+    } else {
+      this.styleClass = defaultStyleClass;
+    }
   }
 
   getTitle(): string {
@@ -43,6 +49,14 @@ export class ZoweNotification {
 
   getPlugin(): string {
     return this.plugin;
+  }
+
+  getStyleClass(): string {
+    if (this.styleClass) {
+      return this.styleClass;
+    } else {
+      return defaultStyleClass;
+    }
   }
 
 }
