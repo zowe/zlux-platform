@@ -91,8 +91,11 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
   removeMessageHandler(object: MVDHosting.ZoweNotificationWatcher) {
     this.handlers.splice(this.handlers.findIndex(x => x === object), 1)
   }
-}
 
+  createNotification(title: string, message: string, type: MVDHosting.ZoweNotificationType, plugin: string){
+    return new ZoweNotification(title, message, type, plugin);
+  }
+}
 
 /*
   This program and the accompanying materials are
