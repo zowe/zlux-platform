@@ -28,16 +28,22 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
   _setURL(wsUrl: string, restUrl: string): void {
     if (!urlSet) {
       this.restUrl = restUrl;
-      let ws = new WebSocket(wsUrl);
+      let ws = new WebSocket(wsUrl, {
+        perMessageDeflate: false
+      });
       var _this = this;
       ws.onmessage = function(message) {
         _this.updateHandlers(JSON.parse(message.data)['notification']);
       }
       ws.onclose = () => {
-        ws = new WebSocket(wsUrl)
+        ws = new WebSocket(wsUrl, {
+          perMessageDeflate: false
+        })
       }
       ws.onerror = () => {
-        ws = new WebSocket(wsUrl)
+        ws = new WebSocket(wsUrl, {
+          perMessageDeflate: false
+        })
       }
       urlSet = true;
     }
