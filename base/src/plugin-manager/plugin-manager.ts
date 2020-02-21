@@ -11,15 +11,26 @@
 */
 
 import { Plugin } from './plugin'
+import { Logger } from '../../../../zlux-shared/src/logging/logger'
+
+const logger = new Logger();
+logger.addDestination(logger.makeDefaultDestination(true,true,true));
+const platformLogger : ZLUX.ComponentLogger = logger.makeComponentLogger("_zsf.bootstrap");
+
+fetch('/ZLUX/plugins/org.zowe.zlux.bootstrap/web/assets/i18n/log/messages_en.json')
+  .then((response) => {
+    return response.json();
+  })
+  .then((myJson) => {
+    (platformLogger as any)._messages = myJson;
+  })
+  .catch((e) => {
+    platformLogger.warn("ZWED5044E - Unable to retrieve message resource file: messages_en.json\n", e);
+  });
 
 export class PluginManager {
   private static desktopPlugin: Plugin | null = null;
   private static pluginsById:Map<string,ZLUX.Plugin> = new Map();
-  private static log:ZLUX.ComponentLogger;
-
-  constructor(logger: ZLUX.ComponentLogger){
-    PluginManager.log = logger;
-  }
 
   private static parsePluginDefinitions(pluginData: any): Plugin[] {
     if (pluginData["pluginDefinitions"] != null) {
@@ -30,8 +41,8 @@ export class PluginManager {
           PluginManager.pluginsById.set(plugin.getIdentifier(),plugin); 
           return plugin;
         } catch (error) {
-          PluginManager.log.severe("ZWED5036E", error);
-          PluginManager.log.warn("ZWED5018W", definition);
+          platformLogger.severe("ZWED5036E", error);
+          platformLogger.warn("ZWED5018W", definition);
           //console.error(error);
           //console.error("Skipping invalid plugin definition");
           //console.error(definition);
