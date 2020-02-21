@@ -29,7 +29,7 @@ export class SemanticVersion {
       this.identifiers = match[4] || null;
       this.build = match[5] || null;
     } else {
-      throw new Error(`${version} is not a valid semantic version`);
+      throw new Error(`ZWED5043E - ${version} is not a valid semantic version`);
     }
   }
 }

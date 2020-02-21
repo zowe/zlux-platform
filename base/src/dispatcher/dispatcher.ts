@@ -26,6 +26,7 @@ import { EventRegistrar } from './event-registrar'
 
 const IFRAME_LOAD_TIMEOUT = 180000; //3 minutes
 
+
 class ActionTarget {
   constructor(
     public readonly wrapper: ApplicationInstanceWrapper,
@@ -84,9 +85,9 @@ export class Dispatcher implements ZLUX.Dispatcher {
    private eventRegistry:EventRegistrar = new EventRegistrar();
    private windowManager: any;
   
-  constructor(logger: ZLUX.Logger){
+  constructor(logger: ZLUX.ComponentLogger){
      /* dispatcher created early on - refering to logger from window object as a result */
-     this.log = logger.makeComponentLogger("ZLUX.Dispatcher");
+     this.log = logger;
      this.runHeartbeat();
      this.registerEventListener("Launch", this.launchApp, "ZLUX.Dispatcher");
      window.addEventListener("message", this.iframeMessageHandler, false);
@@ -129,20 +130,20 @@ export class Dispatcher implements ZLUX.Dispatcher {
 
    runHeartbeat():void {
      let dispatcherHeartbeatFunction = () => {
-     this.log.debug('Recognizers: ', this.recognizers);
-     this.log.debug("dispatcher heart beat");
-     this.log.debug("instances for Types = ", this.instancesForTypes);
-     this.log.debug("indexed recognizers = ", this.indexedRecognizers);
+     this.log.debug("ZWED5020I", this.recognizers); //this.log.debug('Recognizers: ', this.recognizers);
+     this.log.debug("ZWED5021I"); //this.log.debug("dispatcher heart beat");
+     this.log.debug("ZWED5022I", this.instancesForTypes); //this.log.debug("instances for Types = ", this.instancesForTypes);
+     this.log.debug("ZWED5023I", this.indexedRecognizers); //this.log.debug("indexed recognizers = ", this.indexedRecognizers);
      let keyIterator:Iterator<string> = this.instancesForTypes.keys();
      while (true){
        let iterationValue = keyIterator.next();
        if (iterationValue.done) break;
        let key = iterationValue.value;
        let wrappers:ApplicationInstanceWrapper[]|undefined = this.instancesForTypes.get(key);
-       this.log.debug("disp.heartbeat: key "+JSON.stringify(key)+" val=",wrappers);
+       this.log.debug("ZWED5024I", wrappers); //this.log.debug("disp.heartbeat: key "+JSON.stringify(key)+" val=",wrappers);
        if (wrappers){
          for (let wrapper of (wrappers as ApplicationInstanceWrapper[])){
-           this.log.debug("wrapper=",wrapper);
+           this.log.debug("ZWED5025I", wrapper); //this.log.debug("wrapper=",wrapper);
            if (wrapper.isIframe && this.postMessageCallback) {
              this.postMessageCallback(wrapper.applicationInstanceId,
               { dispatchType: "echo",
@@ -151,7 +152,6 @@ export class Dispatcher implements ZLUX.Dispatcher {
            }
          }
        }
-      
      }
 
      window.setTimeout(dispatcherHeartbeatFunction,Dispatcher.dispatcherHeartbeatInterval);
@@ -160,33 +160,33 @@ export class Dispatcher implements ZLUX.Dispatcher {
    }
 
   iframeLoaded(instanceId: MVDHosting.InstanceId, identifier: string):void {
-    this.log.debug(`Dequeuing iframe data`);
+    this.log.debug("ZWED5026I"); //this.log.debug(`Dequeuing iframe data`);
     if (this.postMessageCallback) {
       const contexts = this.pendingIframes.get(identifier);
       if (contexts && contexts.length > 0) {
         let context = contexts.shift();
         if (context) {
-          this.log.debug(`Sending postmessage of type launch to ${identifier} instance=${instanceId}`,context.data);
+          this.log.debug("ZWED5027I", identifier, instanceId, context.data); //this.log.debug(`Sending postmessage of type launch to ${identifier} instance=${instanceId}`,context.data);
           this.postMessageCallback(instanceId,{dispatchType: 'launch', dispatchData: {launchMetadata: context.data, instanceId: instanceId}});
         }
       } else {
-        this.log.debug(`Sending postmessage of type launch to ${identifier} instance=${instanceId}`);
+        this.log.debug("ZWED5028I", identifier, instanceId); //this.log.debug(`Sending postmessage of type launch to ${identifier} instance=${instanceId}`);
         this.postMessageCallback(instanceId,{dispatchType: 'launch', dispatchData: {launchMetadata: null, instanceId: instanceId}});
       }
     }
   }
 
    deregisterPluginInstance(plugin: ZLUX.Plugin, applicationInstanceId: MVDHosting.InstanceId):void {
-     this.log.info(`Dispatcher requested to deregister plugin ${plugin} with id ${applicationInstanceId}`);
+    this.log.info("ZWED5029I", plugin.getIdentifier(), applicationInstanceId); //this.log.info(`Dispatcher requested to deregister plugin ${plugin} with id ${applicationInstanceId}`);
      let key = plugin.getKey();
      let instancesArray = this.instancesForTypes.get(key);
      if (!instancesArray) {
-       this.log.warn("Couldn't deregister instance for plugin ${plugin} because no instances were found");
+      this.log.warn("ZWED5007W", plugin.getIdentifier()); //this.log.warn("Couldn't deregister instance for plugin ${plugin} because no instances were found");
      } else {
        for (let i = 0; i < instancesArray.length; i++) {
          if (instancesArray[i].applicationInstanceId === applicationInstanceId) {
            instancesArray.splice(i,1);
-           this.log.debug(`Deregistered application instance with id ${applicationInstanceId} from plugin ${plugin} successfully`);
+           this.log.debug("ZWED5030I", applicationInstanceId, plugin.getIdentifier()); //this.log.debug(`Deregistered application instance with id ${applicationInstanceId} from plugin ${plugin} successfully`);
            let watchers = this.pluginWatchers.get(key);
            if (watchers) {
              for (let j = 0; j < watchers.length; j++) {
@@ -196,12 +196,12 @@ export class Dispatcher implements ZLUX.Dispatcher {
            return;
          }
        }
-       this.log.warn(`Could not find application instance with id ${applicationInstanceId} in plugins list. Already deregistered?`);
+       this.log.warn("ZWED5008W", applicationInstanceId); //this.log.warn(`Could not find application instance with id ${applicationInstanceId} in plugins list. Already deregistered?`);
      }
    }
 
    registerPluginInstance(plugin: ZLUX.Plugin, applicationInstanceId: MVDHosting.InstanceId, isIframe:boolean, isEmbedded?:boolean): void {
-     this.log.info("Registering plugin="+plugin+" id="+applicationInstanceId);
+    this.log.info("ZWED5031I", plugin.getIdentifier(), applicationInstanceId); //this.log.info("Registering plugin="+plugin+" id="+applicationInstanceId);
      let instanceWrapper = new ApplicationInstanceWrapper(applicationInstanceId,isIframe);
 
      let key = plugin.getKey();
@@ -287,13 +287,13 @@ export class Dispatcher implements ZLUX.Dispatcher {
      //     use all recognizer list
      // need iteration on propertyNames for applicationContext
      // 
-     this.log.debug("getRecognizers",applicationContext);
+     this.log.debug("ZWED5032I", applicationContext); //this.log.debug("getRecognizers",applicationContext);
      for (let propertyName in applicationContext){
        let recognizerIndex:RecognizerIndex|undefined = this.indexedRecognizers.get(propertyName);
-       this.log.debug("recognizerIndex="+recognizerIndex);
+       this.log.debug("ZWED5033I", recognizerIndex); //this.log.debug("recognizerIndex="+recognizerIndex);
        if (recognizerIndex){
          let ruleArray:RecognitionRule[]|undefined = recognizerIndex.valueMap.get(applicationContext[propertyName]);
-         this.log.debug("ruleArray="+ruleArray);
+         this.log.debug("ZWED5034I", ruleArray); //this.log.debug("ruleArray="+ruleArray);
          if (ruleArray){
            for (let rule of ruleArray){
              if (rule.predicate.match(applicationContext)){
@@ -344,16 +344,16 @@ export class Dispatcher implements ZLUX.Dispatcher {
           return new RecognizerOr(...args);
         }
         else {
-          throw new Error(`No args provided for AND/OR recognizer op`);
+          throw new Error(`ZWED5020E - No args provided for AND/OR recognizer op`);
         }
       default:
-        throw new Error(`Recognizer predicate op ${predicateOp.op} not supported`);
+        throw new Error(`ZWED5021E - Recognizer predicate op ${predicateOp.op} not supported`);
       }
     } else if ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop && ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop.length == 2)) {
       const predicateProp: ZLUX.RecognitionObjectPropClause = <ZLUX.RecognitionObjectPropClause> predicateObject;
       return new RecognizerProperty(predicateProp.prop[0],predicateProp.prop[1]);
     } else {
-      throw new Error('Error in recognizer definition');
+      throw new Error('ZWED5022E - Error in recognizer definition');
     }
   }
   
@@ -367,7 +367,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
            let propertyName:string = propertyClause.subClauses[0] as string;
            let propertyValue:string|number = propertyClause.subClauses[1] as string|number;
            let recognizerIndex = this.indexedRecognizers.get(propertyName);
-           this.log.debug("addRecognizer recognizersForIndex="+recognizerIndex);
+           this.log.debug("ZWED5035I", recognizerIndex); //this.log.debug("addRecognizer recognizersForIndex="+recognizerIndex);
            // here - fix me
            // test server/client
            // filter crap - are the screen ID's broken??  - should be no screen ID in applicationContext on first page
@@ -426,7 +426,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
     const existingAction: ZLUX.AbstractAction | undefined = this.actionsByID.get(id);
 
     if (existingAction) {
-      this.log.warn(`duplicate actionId ${id}. Replacing`, existingAction, 'with', action);
+      this.log.warn("ZWED5009W", id, JSON.stringify(existingAction), JSON.stringify(action)); //this.log.warn(`duplicate actionId ${id}. Replacing`, existingAction, 'with', action);
     }
 
     this.actionsByID.set(action.id, action);
@@ -451,13 +451,13 @@ export class Dispatcher implements ZLUX.Dispatcher {
    * @deprecated. Use getAbstractActions instead.
    */
   getAction(recognizer:any): ZLUX.Action|undefined {
-    this.log.debug("actionName "+JSON.stringify(recognizer)+" in "+JSON.stringify(this.actionsByID));
+    this.log.debug("ZWED5036I", JSON.stringify(recognizer), JSON.stringify(this.actionsByID)); //this.log.debug("actionName "+JSON.stringify(recognizer)+" in "+JSON.stringify(this.actionsByID));
     const abstractAction: ZLUX.AbstractAction | undefined = this.getAbstractActionById(recognizer.actionID);
 
     if (this.isConcreteAction(abstractAction)) {
       return abstractAction as ZLUX.Action;
     } else {
-      this.log.warn(`recognizer referenced actionID ${recognizer.actionID}, which did not return a concrete action. Found: `, abstractAction);
+      this.log.warn("ZWED5010W", recognizer.actionID, abstractAction); //this.log.warn(`recognizer referenced actionID ${recognizer.actionID}, which did not return a concrete action. Found: `, abstractAction);
       return undefined;
     }
   }
@@ -545,10 +545,10 @@ export class Dispatcher implements ZLUX.Dispatcher {
        } else if (operation.source == "deref"){
          derefSource = localContext;
        } else {
-         throw "unknown deref source: "+operation.source;
+         throw "ZWED5023E - Unknown deref source: "+operation.source;
        }
        if (!Array.isArray(operation.path)){
-         throw "no path spec for deref: "+JSON.stringify(operation);
+         throw "ZWED5024E - No path spec for deref: "+JSON.stringify(operation);
        }
        var path = operation.path;
        path.forEach((pathElement:any) => {
@@ -556,9 +556,9 @@ export class Dispatcher implements ZLUX.Dispatcher {
            if ((typeof pathElement.op) === "string"){
              pathElement = this.evaluateTemplateOp(pathElement,eventContext,derefSource);
            } else {
-             this.log.debug("path element replacement before: "+pathElement);
+             this.log.debug("ZWED5037I", pathElement); //this.log.debug("path element replacement before: "+pathElement);
              pathElement = dispatcher.buildObjectFromTemplate(pathElement,eventContext);
-             this.log.debug("path element replacement after: "+pathElement);
+             this.log.debug("ZWED5038I", pathElement); //this.log.debug("path element replacement after: "+pathElement);
            }
          }
          let pathElementType:string = (typeof pathElement);
@@ -566,16 +566,16 @@ export class Dispatcher implements ZLUX.Dispatcher {
              (pathElementType === "number")){
            derefSource = derefSource[pathElement];
            if ((typeof derefSource) === "undefined"){
-             throw "dereference to unbound element from "+pathElement;
+             throw "ZWED5025E - Dereference to unbound element from "+pathElement;
            }
          } else {
-           throw "cannot dereference by "+JSON.stringify(pathElement);
+           throw "ZWED5026E - Cannot dereference by "+JSON.stringify(pathElement);
          }
        });
        return derefSource;
      } else if (opName == "concat"){
        if (!Array.isArray(operation.parts)){
-         throw "concat op must have array of parts "+JSON.stringify(operation);
+         throw "ZWED5027E - Concat op must have array of parts "+JSON.stringify(operation);
        }
        let concatenatedString:string = "";
        operation.parts.forEach( (part:any) => {
@@ -596,7 +596,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
      } else if (opName == "localeDate"){
        return (new Date()).toLocaleTimeString();
      } else {
-       throw "unknown substitution op: "+opName;
+       throw "ZWED5028E - Unknown substitution op: "+opName;
      }
    }
 
@@ -607,7 +607,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
 
    buildObjectFromTemplate(template:any, eventContext:any):any{
       if (!template || this.isEmpty(template)) {
-        this.log.debug('no template provided, returning argument "as is"', eventContext);
+        this.log.debug("ZWED5039I", eventContext); //this.log.debug('no template provided, returning argument "as is"', eventContext);
         return eventContext;
       }
 
@@ -628,7 +628,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
               outputObject[propName] = dispatcher.buildObjectFromTemplate(substitutionSpec, eventContext);
             }
           } else {
-	        throw "no known substitution for type "+specType+": "+substitutionSpec;
+	        throw "ZWED5029E - No known substitution for type "+specType+": "+substitutionSpec;
           }
         }
       }
@@ -692,7 +692,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
   
   private getAppInstanceWrapper(plugin:ZLUX.Plugin, id:MVDHosting.InstanceId) :ApplicationInstanceWrapper|null{
     let wrappers:ApplicationInstanceWrapper[]|undefined = this.instancesForTypes.get(plugin.getKey());
-    this.log.debug("found some wrappers "+wrappers);
+    this.log.debug("ZWED5040I", JSON.stringify(wrappers)); //this.log.debug("found some wrappers "+wrappers);
     if (wrappers){
       for (let wrapper of (wrappers as ApplicationInstanceWrapper[])){
         if (wrapper.applicationInstanceId === id){
@@ -732,7 +732,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
   private createAsync(plugin:ZLUX.Plugin, action:Action, eventContext: any):Promise<ActionTarget>{
     //let appPromise:Promise<MVDHosting.InstanceId>
     if (!this.launchCallback){
-      return Promise.reject("no launch callback established");
+      return Promise.reject("ZWED5030E - No launch callback established");
     }
     let launchMetadata = this.buildObjectFromTemplate(action.primaryArgument, eventContext);
     this.addPendingIframe(plugin, launchMetadata)
@@ -742,10 +742,10 @@ export class Dispatcher implements ZLUX.Dispatcher {
         if (wrapper){
           return new ActionTarget(wrapper,false);
         } else {
-          return Promise.reject("could not find wrapper after launch/create for "+plugin.getIdentifier());
+          return Promise.reject("ZWED5031E - Could not find wrapper after launch/create for "+plugin.getIdentifier());
         }
       }).catch((error:any) => {
-        this.log.warn("Caught error from launchcallback, e="+error);
+        this.log.warn("ZWED5011W", error); //this.log.warn("Caught error from launchcallback, e="+error);
       });
     return appPromise;
   }
@@ -754,7 +754,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
     let plugin:ZLUX.Plugin|undefined = ZoweZLUX.pluginManager.getPlugin(action.targetPluginID);
     let applicationInstanceId:MVDHosting.InstanceId|undefined = eventContext.applicationInstanceId;
     if (plugin){
-      this.log.debug(" ectxt="+eventContext);
+      this.log.debug("ZWED5041I", eventContext); //this.log.debug(" ectxt="+eventContext);
       switch (action.targetMode){
         case ActionTargetMode.PluginCreate:
           return this.createAsync(plugin,action, eventContext);
@@ -776,17 +776,17 @@ export class Dispatcher implements ZLUX.Dispatcher {
             return this.createAsync(plugin, action, eventContext);
           }
         case ActionTargetMode.System:
-          return Promise.reject("not yet implemented");
+          return Promise.reject("ZWED5032E - Not yet implemented");
         default:
-          return Promise.reject("unknown target mode");
+          return Promise.reject("ZWED5033E - Unknown target mode");
       }
     } else {
-      return Promise.reject("no plugin");
+      return Promise.reject("ZWED5034E - No plugin");
     }
   }
 
   invokeAction(action:Action, eventContext: any, targetId?: number):any{
-    this.log.info("dispatcher.invokeAction on context "+JSON.stringify(eventContext));
+    this.log.info("ZWED5042I", JSON.stringify(eventContext)); //this.log.info("dispatcher.invokeAction on context "+JSON.stringify(eventContext));
     this.getActionTarget(action,eventContext).then( (target: ActionTarget) => {
       const wrapper = target.wrapper; 
       switch (action.type) {
@@ -795,7 +795,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
           break;
         } //else fall-through
       case ActionType.Message:
-        this.log.debug('Invoking message type Action');
+        this.log.debug("ZWED5043I"); //this.log.debug('Invoking message type Action');
         //TODO is eventContext here different from this.buildObjectFromTemplate(action.primaryArgument, eventContext);
         if (wrapper.callbacks && wrapper.callbacks.onMessage) {
           wrapper.callbacks.onMessage(eventContext);
@@ -810,18 +810,18 @@ export class Dispatcher implements ZLUX.Dispatcher {
           if (targetId && this.windowManager) {
              this.windowManager.minimize(targetId);
           }else {
-           this.log.warn('Target ID not provided or windowManager not initialized');
+            this.log.warn("ZWED5012W"); //this.log.warn('Target ID not provided or windowManager not initialized');
           }
           break;
       case ActionType.Maximize:
           if (targetId && this.windowManager) {
              this.windowManager.maximize(targetId);
           }else {
-             this.log.warn('Target ID not provided or windowManager not initialized');
+            this.log.warn("ZWED5013W"); //this.log.warn('Target ID not provided or windowManager not initialized');
           }
           break;
       default:
-        this.log.warn("Unhandled action type = "+action.type);
+        this.log.warn("ZWED5014W", action.type); //this.log.warn("Unhandled action type = "+action.type);
       };
     });
   }
@@ -888,7 +888,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
             reject(err)
         })
       } else {
-        reject("The event \"" + eventName + "\" is not registered and could not be dispatched")
+        reject("ZWED5035E - The event \"" + eventName + "\" is not registered and could not be dispatched")
       }
     })
   }
@@ -941,7 +941,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
           }
         });
       } else {
-        this.log.warn("The event \"" + eventName + "\" is not registered and listener could not be made");
+        this.log.warn("ZWED5015W", eventName); //this.log.warn("The event \"" + eventName + "\" is not registered and listener could not be made");
       }
     }
   }
@@ -957,7 +957,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
           }
         });
       } else {
-        this.log.warn("The event \"" + eventName + "\" is not registered and listener could not unregister");
+        this.log.warn("ZWED5016W", eventName); //this.log.warn("The event \"" + eventName + "\" is not registered and listener could not unregister");
       }
       this.eventRegistry.deregisterEvent(eventName, pluginId, appId);
     }
@@ -1012,7 +1012,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
        this.windowManager = windowManager;
        return true;
     }
-    this.log.warn('windowManager has already been initialized');
+    this.log.warn("ZWED5017W"); //this.log.warn('windowManager has already been initialized');
     return false;
   }
 }
