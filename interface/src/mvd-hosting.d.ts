@@ -65,9 +65,11 @@ declare namespace MVDHosting {
   }
 
   export interface PluginManagerInterface {
-    loadApplicationPluginDefinitions(): Promise<DesktopPluginDefinition[]>;
-    loadApplicationPluginDefinitionsMap(): Promise<Map<string, DesktopPluginDefinition>>;
-    findPluginDefinition(identifier: string): Promise<DesktopPluginDefinition | null>;
+    loadApplicationPluginDefinitions(update?: boolean): Promise<DesktopPluginDefinition[]>;
+    loadApplicationPluginDefinitionsMap(update?: boolean): Promise<Map<string, DesktopPluginDefinition>>;
+    findPluginDefinition(identifier: string, update?: boolean): Promise<DesktopPluginDefinition | null>;
+    updateMap(): Promise<Map<string, DesktopPluginDefinition>>;
+    pluginsAdded: EventEmitter<MVDHosting.DesktopPluginDefinition[]>
   }
 
   export interface LoginActionInterface {
