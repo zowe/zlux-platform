@@ -216,7 +216,7 @@ declare namespace ZLUX {
     rasUri(uri: string): string;
     serverRootUri(uri: string): string;
     pluginResourceUri(pluginDefinition: Plugin, relativePath: string): string;
-    pluginListUri(pluginType?: PluginType): string;
+    pluginListUri(pluginType?: PluginType, update?:boolean): string;
     pluginConfigForScopeUri(pluginDefinition: ZLUX.Plugin, scope: string, resourcePath: string, resourceName?: string): string;
     /**
        Returns a URI for accessing a resource for a particular user. NOTE: This command should be gated by authorization that restricts it to administrative use.
@@ -236,7 +236,6 @@ declare namespace ZLUX {
     pluginRESTUri(pluginDefinition: Plugin, serviceName: string, 
         relativePath: string, version?: string): string;
   }
-
   
   interface PluginWatcher {
     instanceAdded(instanceId: MVDHosting.InstanceId, isEmbedded: boolean|undefined): void;
@@ -246,7 +245,9 @@ declare namespace ZLUX {
   const enum PluginType {
     Desktop = "desktop",
     Application = "application",
-    Bootstrap = "bootstrap"
+    Bootstrap = "bootstrap",
+    NodeAuthentication = "nodeAuthentication",
+    Library = "library"
   }
 
   interface Plugin {
@@ -257,6 +258,7 @@ declare namespace ZLUX {
     getType():PluginType;
     getCopyright(): string;
     hasComponents(): boolean;
+    getBasePlugin(): any;
   }
 
   interface ContainerPluginDefinition {
