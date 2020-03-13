@@ -44,7 +44,7 @@ export abstract class Plugin implements ZLUX.Plugin {
       case 1:
         return new Plugin_1(definition);
       default:
-        throw new Error("Unrecognized plugin definition major version");
+        throw new Error("ZWED5038E - Unrecognized plugin definition major version");
     }
   }
 
@@ -85,13 +85,13 @@ class Plugin_0 extends Plugin {
     if (typeof definition.identifier === "string") {
       this.identifier = definition.identifier;
     } else {
-      throw new Error("Plugin identifier is not a string");
+      throw new Error("ZWED5039E - Plugin identifier is not a string");
     }
 
     if (typeof definition.pluginVersion === "string") {
       this.version = definition.pluginVersion;
     } else {
-      throw new Error("Plugin version is not a string");
+      throw new Error("ZWED5040E - Plugin version is not a string");
     }
 
     if (typeof definition.pluginType === "string") {
@@ -99,10 +99,10 @@ class Plugin_0 extends Plugin {
       if (pluginType != null) {
         this.type = pluginType;
       } else {
-        throw new Error("Plugin type is not present");
+        throw new Error("ZWED5041E - Plugin type is not present");
       }
     } else {
-      throw new Error("Plugin type is not a string");
+      throw new Error("ZWED5042E - Plugin type is not a string");
     }
     
     this.key = definition.identifier + '@' + definition.pluginVersion;

@@ -15,6 +15,7 @@ import { Plugin } from './plugin'
 export class PluginManager {
   private static desktopPlugin: Plugin | null = null;
   private static pluginsById:Map<string,ZLUX.Plugin> = new Map();
+  public static logger:ZLUX.ComponentLogger;
   
   private static parsePluginDefinitions(pluginData: any): Plugin[] {
     if (pluginData["pluginDefinitions"] != null) {
@@ -25,9 +26,11 @@ export class PluginManager {
           PluginManager.pluginsById.set(plugin.getIdentifier(),plugin); 
           return plugin;
         } catch (error) {
-          console.error(error);
-          console.error("Skipping invalid plugin definition");
-          console.error(definition);
+          PluginManager.logger.severe("ZWED5036E", error);
+          PluginManager.logger.warn("ZWED5018W", definition);
+          //console.error(error);
+          //console.error("Skipping invalid plugin definition");
+          //console.error(definition);
 
           return null;
         }
@@ -36,7 +39,7 @@ export class PluginManager {
       /* Remove skipped plugins */
       return plugins.filter(x => x) as Plugin[];
     } else {
-      throw new Error("Unable to parse plugin definitions: Missing field 'pluginDefinitions'");
+      throw new Error("ZWED5037E - Unable to parse plugin definitions: Missing field 'pluginDefinitions'");
     }
   }
 
