@@ -20,6 +20,10 @@ function parsePluginType(value: string): ZLUX.PluginType | null {
       return ZLUX.PluginType.Application;
     case "bootstrap":
       return ZLUX.PluginType.Bootstrap;
+    case "library":
+      return ZLUX.PluginType.Library;
+    case "nodeAuthentication":
+      return ZLUX.PluginType.NodeAuthentication;
     default:
       return null;
   }
@@ -58,6 +62,8 @@ export abstract class Plugin implements ZLUX.Plugin {
 
   abstract hasComponents(): boolean;
 
+  abstract getBasePlugin(): any;
+
   public toString():string {
     return "<ZLUX.plugin "+this.getKey()+">";
   }
@@ -71,6 +77,7 @@ class Plugin_0 extends Plugin {
   readonly key:string;
   readonly copyright:string;
   readonly _hasComponents: boolean;
+  readonly _definition: any;
 
   constructor(definition: any) {
     super()
@@ -112,7 +119,8 @@ class Plugin_0 extends Plugin {
     
     if (typeof definition.copyright === "string") {
       this.copyright = definition.copyright;
-    } 
+    }
+    this._definition = definition;
   }
 
   getIdentifier():string{
@@ -141,6 +149,10 @@ class Plugin_0 extends Plugin {
 
   hasComponents(): boolean {
     return this._hasComponents;
+  }
+
+  getBasePlugin():any{
+    return this._definition;
   }
 
 }

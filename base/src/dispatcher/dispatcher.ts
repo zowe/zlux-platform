@@ -805,6 +805,11 @@ export class Dispatcher implements ZLUX.Dispatcher {
                                      dispatchData: eventContext
                                    });
         }
+        if (targetId && this.windowManager) {
+          this.windowManager.focus(targetId);
+        } else if (this.windowManager) {
+          this.windowManager.focus(wrapper.applicationInstanceId);
+        }
         break;
       case ActionType.Minimize:
           if (targetId && this.windowManager) {

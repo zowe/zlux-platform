@@ -16,7 +16,7 @@ export class PluginManager {
   private static desktopPlugin: Plugin | null = null;
   private static pluginsById:Map<string,ZLUX.Plugin> = new Map();
   public static logger:ZLUX.ComponentLogger;
-
+  
   private static parsePluginDefinitions(pluginData: any): Plugin[] {
     if (pluginData["pluginDefinitions"] != null) {
       const pluginDefinitions: any[] = pluginData["pluginDefinitions"];
@@ -47,8 +47,12 @@ export class PluginManager {
     return PluginManager.pluginsById.get(id);
   }
 
-  static loadPlugins(pluginType?: ZLUX.PluginType): Promise<ZLUX.Plugin[]> {
+  static loadPlugins(pluginType?: ZLUX.PluginType, update?: boolean): Promise<ZLUX.Plugin[]> {
     return new Promise((resolve, reject) => {
+      if (PluginManager.pluginsById.size > 0 && !update) {
+        return resolve(Array.from(PluginManager.pluginsById.values()).filter(plugin => plugin.getType() == pluginType));
+      }
+
       var request = new XMLHttpRequest();
       request.onreadystatechange = function () {
         if (this.readyState == 4) {
@@ -58,7 +62,13 @@ export class PluginManager {
             case 304:
               try {
                 var result = JSON.parse(this.responseText);
-                resolve(PluginManager.parsePluginDefinitions(result));
+                let allPlugins = PluginManager.parsePluginDefinitions(result);
+                if (!pluginType) {
+                  resolve(allPlugins);
+                } else {
+                  const filtered = allPlugins.filter(plugin => plugin.getType() == pluginType)
+                  resolve(filtered);
+                }
               } catch (error) {
                 reject(error);
               }
@@ -69,7 +79,7 @@ export class PluginManager {
           }
         }
       };
-      request.open("GET", ZoweZLUX.uriBroker.pluginListUri(pluginType), true);
+      request.open("GET", ZoweZLUX.uriBroker.pluginListUri(undefined, update), true);
       request.send();
     });
   }
