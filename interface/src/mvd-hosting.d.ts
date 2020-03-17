@@ -90,6 +90,8 @@ declare namespace MVDHosting {
     registerPreLogoutAction(action: LogoutAction):void;
     performLogin(username: string, password: string): Observable<Response>;
     requestPasswordChangeScreen(): void;
+    hidePasswordChangeScreen(): void;
+    passwordChangeSuccessfulScreen(): void;
   }
 
   export interface ZoweNotificationManagerInterface {
