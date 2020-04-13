@@ -26,6 +26,12 @@ declare namespace MVDHosting {
     Application = 2
   }
 
+  export const enum LoginScreenChangeReason {
+    UserLogout,
+    UserLogin,
+    SessionExpired
+  }
+
   export const enum DESKTOP_PLUGIN_DEFAULTS {
     WIDTH = 809,
     HEIGHT = 1280
@@ -92,6 +98,7 @@ declare namespace MVDHosting {
     requestPasswordChangeScreen(): void;
     hidePasswordChangeScreen(): void;
     passwordChangeSuccessfulScreen(): void;
+    loginScreenVisibilityChanged: EventEmitter<LoginScreenChangeReason>;
   }
 
   export interface ZoweNotificationManagerInterface {
