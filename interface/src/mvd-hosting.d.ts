@@ -29,7 +29,10 @@ declare namespace MVDHosting {
   export const enum LoginScreenChangeReason {
     UserLogout,
     UserLogin,
-    SessionExpired
+    SessionExpired,
+    PasswordChange,
+    PasswordChangeSuccess,
+    HidePasswordChange
   }
 
   export const enum DESKTOP_PLUGIN_DEFAULTS {
