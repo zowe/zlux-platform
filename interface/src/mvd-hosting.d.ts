@@ -29,7 +29,10 @@ declare namespace MVDHosting {
   export const enum LoginScreenChangeReason {
     UserLogout,
     UserLogin,
-    SessionExpired
+    SessionExpired,
+    PasswordChange,
+    PasswordChangeSuccess,
+    HidePasswordChange
   }
 
   export const enum DESKTOP_PLUGIN_DEFAULTS {
@@ -95,6 +98,9 @@ declare namespace MVDHosting {
     registerPostLoginAction(action: LoginAction):void;
     registerPreLogoutAction(action: LogoutAction):void;
     performLogin(username: string, password: string): Observable<Response>;
+    requestPasswordChangeScreen(): void;
+    hidePasswordChangeScreen(): void;
+    passwordChangeSuccessfulScreen(): void;
     loginScreenVisibilityChanged: EventEmitter<LoginScreenChangeReason>;
   }
 
