@@ -18,12 +18,22 @@ declare namespace MVDHosting {
     ApplicationManagerToken = "com.rs.mvd.hosting.application-manager",
     ViewportManagerToken = "com.rs.mvd.hosting.viewport-manager",
     PluginManagerToken = "com.rs.mvd.hosting.plugin-manager",
-    AuthenticationManagerToken = "com.rs.mvd.hosting.authentication-manager"
+    AuthenticationManagerToken = "com.rs.mvd.hosting.authentication-manager",
+    ThemeEmitterToken = "com.rs.mvd.hosting.theme-emitter"
   }
 
   export const enum ZoweNotificationType {
     System = 1,
     Application = 2
+  }
+
+  export const enum LoginScreenChangeReason {
+    UserLogout,
+    UserLogin,
+    SessionExpired,
+    PasswordChange,
+    PasswordChangeSuccess,
+    HidePasswordChange
   }
 
   export const enum DESKTOP_PLUGIN_DEFAULTS {
@@ -65,9 +75,11 @@ declare namespace MVDHosting {
   }
 
   export interface PluginManagerInterface {
-    loadApplicationPluginDefinitions(): Promise<DesktopPluginDefinition[]>;
-    loadApplicationPluginDefinitionsMap(): Promise<Map<string, DesktopPluginDefinition>>;
-    findPluginDefinition(identifier: string): Promise<DesktopPluginDefinition | null>;
+    loadApplicationPluginDefinitions(update?: boolean): Promise<DesktopPluginDefinition[]>;
+    loadApplicationPluginDefinitionsMap(update?: boolean): Promise<Map<string, DesktopPluginDefinition>>;
+    findPluginDefinition(identifier: string, update?: boolean): Promise<DesktopPluginDefinition | null>;
+    updateMap(): Promise<Map<string, DesktopPluginDefinition>>;
+    pluginsAdded: EventEmitter<MVDHosting.DesktopPluginDefinition[]>
   }
 
   export interface LoginActionInterface {
@@ -87,6 +99,10 @@ declare namespace MVDHosting {
     registerPostLoginAction(action: LoginAction):void;
     registerPreLogoutAction(action: LogoutAction):void;
     performLogin(username: string, password: string): Observable<Response>;
+    requestPasswordChangeScreen(): void;
+    hidePasswordChangeScreen(): void;
+    passwordChangeSuccessfulScreen(): void;
+    loginScreenVisibilityChanged: EventEmitter<LoginScreenChangeReason>;
   }
 
   export interface ZoweNotificationManagerInterface {

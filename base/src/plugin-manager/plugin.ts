@@ -20,6 +20,10 @@ function parsePluginType(value: string): ZLUX.PluginType | null {
       return ZLUX.PluginType.Application;
     case "bootstrap":
       return ZLUX.PluginType.Bootstrap;
+    case "library":
+      return ZLUX.PluginType.Library;
+    case "nodeAuthentication":
+      return ZLUX.PluginType.NodeAuthentication;
     default:
       return null;
   }
@@ -40,7 +44,7 @@ export abstract class Plugin implements ZLUX.Plugin {
       case 1:
         return new Plugin_1(definition);
       default:
-        throw new Error("Unrecognized plugin definition major version");
+        throw new Error("ZWED5038E - Unrecognized plugin definition major version");
     }
   }
 
@@ -58,6 +62,8 @@ export abstract class Plugin implements ZLUX.Plugin {
 
   abstract hasComponents(): boolean;
 
+  abstract getBasePlugin(): any;
+
   public toString():string {
     return "<ZLUX.plugin "+this.getKey()+">";
   }
@@ -71,6 +77,7 @@ class Plugin_0 extends Plugin {
   readonly key:string;
   readonly copyright:string;
   readonly _hasComponents: boolean;
+  readonly _definition: any;
 
   constructor(definition: any) {
     super()
@@ -78,13 +85,13 @@ class Plugin_0 extends Plugin {
     if (typeof definition.identifier === "string") {
       this.identifier = definition.identifier;
     } else {
-      throw new Error("Plugin identifier is not a string");
+      throw new Error("ZWED5039E - Plugin identifier is not a string");
     }
 
     if (typeof definition.pluginVersion === "string") {
       this.version = definition.pluginVersion;
     } else {
-      throw new Error("Plugin version is not a string");
+      throw new Error("ZWED5040E - Plugin version is not a string");
     }
 
     if (typeof definition.pluginType === "string") {
@@ -92,10 +99,10 @@ class Plugin_0 extends Plugin {
       if (pluginType != null) {
         this.type = pluginType;
       } else {
-        throw new Error("Plugin type is not present");
+        throw new Error("ZWED5041E - Plugin type is not present");
       }
     } else {
-      throw new Error("Plugin type is not a string");
+      throw new Error("ZWED5042E - Plugin type is not a string");
     }
     
     this.key = definition.identifier + '@' + definition.pluginVersion;
@@ -112,7 +119,8 @@ class Plugin_0 extends Plugin {
     
     if (typeof definition.copyright === "string") {
       this.copyright = definition.copyright;
-    } 
+    }
+    this._definition = definition;
   }
 
   getIdentifier():string{
@@ -141,6 +149,10 @@ class Plugin_0 extends Plugin {
 
   hasComponents(): boolean {
     return this._hasComponents;
+  }
+
+  getBasePlugin():any{
+    return this._definition;
   }
 
 }
