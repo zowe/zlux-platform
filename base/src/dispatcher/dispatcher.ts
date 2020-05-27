@@ -118,7 +118,6 @@ export class Dispatcher implements ZLUX.Dispatcher {
              watchers[k].instanceRemoved(instance.applicationInstanceId);
            }
          }
-         return;
        }
        type = typesIt.next();
      }
@@ -1061,8 +1060,7 @@ export class RecognitionClause{
     this.operation = op;
   }
 
-  match(applicationContext:any):boolean{
-     applicationContext;  // shuddup
+  match(_applicationContext:any):boolean{
      return false;
   }
 }
