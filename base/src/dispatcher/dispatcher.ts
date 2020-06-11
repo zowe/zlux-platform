@@ -784,9 +784,9 @@ export class Dispatcher implements ZLUX.Dispatcher {
     }
   }
 
-  invokeAction(action:Action, eventContext: any, targetId?: number):any{
+  invokeAction(action:Action, eventContext: any, targetId?: number): Promise<void> {
     this.log.info("ZWED5042I", JSON.stringify(eventContext)); //this.log.info("dispatcher.invokeAction on context "+JSON.stringify(eventContext));
-    this.getActionTarget(action,eventContext).then( (target: ActionTarget) => {
+    return this.getActionTarget(action,eventContext).then( (target: ActionTarget) => {
       const wrapper = target.wrapper; 
       switch (action.type) {
       case ActionType.Launch:

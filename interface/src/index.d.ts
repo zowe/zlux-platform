@@ -59,7 +59,7 @@ declare namespace ZLUX {
     callEveryone(eventName: string, data: Object, failOnError: boolean): Promise<any>;
     registerEventListener(eventName: string, callback: EventListenerOrEventListenerObject | null, appId: string): void;
     deregisterEventListener(eventName: string, callback: EventListenerOrEventListenerObject | null, appId: string, pluginId:string): void;
-    invokeAction(action: Action, eventContext: any, targetId?: number): any;
+    invokeAction(action: Action, eventContext: any, targetId?: number): Promise<void>;
     makeAction(id: string, defaultName: string, targetMode: ActionTargetMode, type: ActionType, targetPluginID: string, primaryArgument: any): Action;
     makeActionFromObject(action: AbstractAction): AbstractAction;
     registerApplicationCallbacks(plugin: Plugin, applicationInstanceId: any, callbacks: ApplicationCallbacks): void;
