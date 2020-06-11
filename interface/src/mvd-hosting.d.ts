@@ -18,7 +18,8 @@ declare namespace MVDHosting {
     ApplicationManagerToken = "com.rs.mvd.hosting.application-manager",
     ViewportManagerToken = "com.rs.mvd.hosting.viewport-manager",
     PluginManagerToken = "com.rs.mvd.hosting.plugin-manager",
-    AuthenticationManagerToken = "com.rs.mvd.hosting.authentication-manager"
+    AuthenticationManagerToken = "com.rs.mvd.hosting.authentication-manager",
+    ThemeEmitterToken = "com.rs.mvd.hosting.theme-emitter"
   }
 
   export const enum ZoweNotificationType {
