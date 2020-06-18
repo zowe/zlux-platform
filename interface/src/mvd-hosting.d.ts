@@ -36,6 +36,10 @@ declare namespace MVDHosting {
     HidePasswordChange
   }
 
+  export const enum saveApplicationDataDefaults {
+    saveDataInterval = 10000
+  }
+
   export const enum DESKTOP_PLUGIN_DEFAULTS {
     WIDTH = 809,
     HEIGHT = 1280
@@ -72,6 +76,7 @@ declare namespace MVDHosting {
 //must be same exact pointer, otherwise return = false, not found.
     isApplicationRunning(plugin: DesktopPluginDefinition): boolean;
     getViewportComponentRef(viewportId: MVDHosting.ViewportId): ComponentRef<any> | null;
+    saveApplicationData: EventEmitter<saveApplicationDataDefaults>;
   }
 
   export interface PluginManagerInterface {
