@@ -27,6 +27,7 @@ declare namespace MVDWindowManagement {
     closeAllWindows():void;
     requestWindowFocus(windowId: MVDWindowManagement.WindowId): boolean;
     autoSaveFileAllowDelete : boolean;
+    autoSaveDataClean : boolean;
   }
 }
 
