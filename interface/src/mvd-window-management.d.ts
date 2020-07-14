@@ -28,6 +28,7 @@ declare namespace MVDWindowManagement {
     requestWindowFocus(windowId: MVDWindowManagement.WindowId): boolean;
     autoSaveFileAllowDelete : boolean;
     autoSaveDataClean : boolean;
+    launchDesktopAutoSavedApplications() : void;
   }
 }
 
