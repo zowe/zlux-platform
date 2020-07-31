@@ -163,6 +163,20 @@ declare namespace ZLUX {
     applicationContext: any;
   }
 
+  interface Environment {
+    //should cache
+    get(key:string): Promise<string|undefined>;
+    getComponentGroups(): Promise<string[]|undefined>;
+    getExternalComponents(): Promise<string[]|undefined>;
+    getGatewayPort(): Promise<number|undefined>;
+    getGatewayHost(): Promise<string|undefined>;
+    getPlatform(): Promise<string>;
+    getArch(): Promise<string>;
+    //should poll server
+    getTime(): Promise<Date>;
+  }
+
+  
   interface ComponentLogger {
     log(minimumLevel: number, ...loggableItems:any[]): void;
     info(...loggableItems:any[]): void;
@@ -793,6 +807,7 @@ declare class ZoweZLUXResources {
   static pluginManager: any;
   static uriBroker: ZLUX.UriBroker;
   static dispatcher: ZLUX.Dispatcher;
+  static environment: ZLUX.Environment;
   static logger: ZLUX.Logger;
   static registry: ZLUX.Registry;
   //previously was NotificationManager
