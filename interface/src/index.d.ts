@@ -191,7 +191,11 @@ declare namespace ZLUX {
     forceOverwrite?: boolean,
     sessionID?: number,
     lastChunk?: boolean,
-    responseType?: string
+    responseType?: string,
+    mode?: string,
+    recursive?: boolean, 
+    user?: string, 
+    group?: string
   }
 
   /**
@@ -211,7 +215,8 @@ declare namespace ZLUX {
                 sourceEncodingOrOptions?: string | UnixFileUriOptions | undefined,
                 targetEncoding?: string | undefined, newName?: string | undefined,
                 forceOverwrite?: boolean | undefined, sessionID?: number | undefined, 
-                 lastChunk?: boolean | undefined, responseType?: string): string;
+                lastChunk?: boolean | undefined, responseType?: string, mode?: string,
+                recursive?: boolean, user?: string, group?: string): string;
     omvsSegmentUri(): string;
     rasUri(uri: string): string;
     serverRootUri(uri: string): string;
