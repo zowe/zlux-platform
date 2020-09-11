@@ -192,7 +192,10 @@ declare namespace ZLUX {
     sessionID?: number,
     lastChunk?: boolean,
     responseType?: string,
-    mode?: string
+    mode?: string,
+    recursive?: boolean, 
+    user?: string, 
+    group?: string
   }
 
   /**
