@@ -185,18 +185,22 @@ declare namespace ZLUX {
   }
 
   type UnixFileUriOptions = {
-    sourceEncoding?: string,
-    targetEncoding?: string,
-    newName?: string,
-    forceOverwrite?: boolean,
-    sessionID?: number,
-    lastChunk?: boolean,
-    responseType?: string,
-    mode?: string,
-    recursive?: boolean, 
-    user?: string, 
-    group?: string
+    sourceEncoding?: string;
+    targetEncoding?: string;
+    newName?: string;
+    forceOverwrite?: boolean;
+    sessionID?: number;
+    lastChunk?: boolean;
+    responseType?: string;
+    mode?: string;
+    recursive?: boolean;
+    user?: string;
+    group?: string;
+    type?: TagType;
+    codeset?: number;
   }
+  
+  type TagType = 'binary' | 'delete' | 'mixed' | 'text'; 
 
   /**
      An interface which allows an App easy access to URIs specific to its own namespace
@@ -216,7 +220,9 @@ declare namespace ZLUX {
                 targetEncoding?: string | undefined, newName?: string | undefined,
                 forceOverwrite?: boolean | undefined, sessionID?: number | undefined, 
                 lastChunk?: boolean | undefined, responseType?: string, mode?: string,
-                recursive?: boolean, user?: string, group?: string): string;
+                recursive?: boolean, user?: string, group?: string,
+                type?: TagType, codeset?: number
+               ): string;
     omvsSegmentUri(): string;
     rasUri(uri: string): string;
     serverRootUri(uri: string): string;
