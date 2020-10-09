@@ -197,6 +197,7 @@ declare namespace ZLUX {
     user?: string, 
     group?: string
   }
+  
 
   /**
      An interface which allows an App easy access to URIs specific to its own namespace
@@ -207,6 +208,7 @@ declare namespace ZLUX {
     datasetMetadataHlqUri(updateCache?: boolean, types?: string, workAreaSize?: number, resumeName?: string, resumeCatalogName?: string): string;
     datasetMetadataUri(dsn: string, detail?: string, types?: string, listMembers?: boolean, workAreaSize?: number, includeMigrated?: boolean, includeUnprintable?: boolean, resumeName?: string, resumeCatalogName?: string, addQualifiers?: string): string;
     datasetContentsUri(dsn: string): string;
+    datasetEnqueueUri(dsn: string): string;
     VSAMdatasetContentsUri(dsn: string, closeAfter?: boolean): string;
     /*TODO: for breaking change, we need to change this into a passed object so that its way cleaner and
             more clear as to what is going on
