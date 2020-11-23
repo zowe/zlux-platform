@@ -799,6 +799,16 @@ declare class ZoweZLUXResources {
   static globalization: ZLUX.Globalization;
 }
 
+interface Window {
+  GIZA_PLUGIN_TO_BE_LOADED?: string;
+  GIZA_SIMPLE_CONTAINER_REQUESTED?: boolean;
+  GIZA_ENVIRONMENT?: string;
+  ZOWE_SWM_SHOW_LOGIN?: number;
+  ZoweZLUX: typeof ZoweZLUXResources | DSMResources;
+  COM_RS_COMMON_LOGGER: Logger;
+  // etc
+}
+
 /*
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
