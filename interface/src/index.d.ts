@@ -803,9 +803,9 @@ interface Window {
   GIZA_PLUGIN_TO_BE_LOADED?: string;
   GIZA_SIMPLE_CONTAINER_REQUESTED?: boolean;
   GIZA_ENVIRONMENT?: string;
-  ZOWE_SWM_SHOW_LOGIN?: number;
-  ZoweZLUX: typeof ZoweZLUXResources | DSMResources;
-  COM_RS_COMMON_LOGGER: Logger;
+  ZOWE_SWM_SHOW_LOGIN?: boolean;
+  COM_RS_COMMON_LOGGER: Logger
+  ZoweZLUX: typeof ZoweZLUXResources | typeof DSMResources;
   // etc
 }
 

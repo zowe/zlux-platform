@@ -733,7 +733,12 @@ export class Dispatcher implements ZLUX.Dispatcher {
     if (!this.launchCallback){
       return Promise.reject("ZWED5030E - No launch callback established");
     }
-    let launchMetadata = this.buildObjectFromTemplate(action.primaryArgument, eventContext);
+    let launchMetadata;
+    if (eventContext && eventContext.zlux) {
+      launchMetadata = this.buildObjectFromTemplate(null, eventContext); // TODO: Implement template that includes future Zlux content
+    } else {
+      launchMetadata = this.buildObjectFromTemplate(action.primaryArgument, eventContext);
+    }
     this.addPendingIframe(plugin, launchMetadata)
     let appPromise = 
       this.launchCallback(plugin, launchMetadata).then( (newAppID:MVDHosting.InstanceId) => {
