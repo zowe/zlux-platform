@@ -804,9 +804,8 @@ interface Window {
   GIZA_SIMPLE_CONTAINER_REQUESTED?: boolean;
   GIZA_ENVIRONMENT?: string;
   ZOWE_SWM_SHOW_LOGIN?: boolean;
-  COM_RS_COMMON_LOGGER: Logger
-  ZoweZLUX: typeof ZoweZLUXResources | typeof DSMResources;
-  // etc
+  COM_RS_COMMON_LOGGER: Logger;
+  ZoweZLUX: typeof ZoweZLUXResources;
 }
 
 /*
