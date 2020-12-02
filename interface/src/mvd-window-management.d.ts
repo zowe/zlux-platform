@@ -20,6 +20,7 @@ declare namespace MVDWindowManagement {
 
   export interface WindowManagerServiceInterface{
     createWindow(plugin: MVDHosting.DesktopPluginDefinition): MVDWindowManagement.WindowId;
+    createFullscreenStandaloneWindow(plugin: MVDHosting.DesktopPluginDefinition): MVDWindowManagement.WindowId;
     getViewportId(windowId: MVDWindowManagement.WindowId): MVDHosting.ViewportId ;
     getWindow(plugin: MVDHosting.DesktopPluginDefinition): MVDWindowManagement.WindowId | null;
     showWindow(windowId: MVDWindowManagement.WindowId): void;
