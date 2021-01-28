@@ -413,7 +413,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
     
   private isConcreteAction(action: ZLUX.AbstractAction | undefined): boolean {
     const actionAsAny: any = action as any;
-    return actionAsAny && actionAsAny.targetPluginID && actionAsAny.type && actionAsAny.targetMode;
+    return actionAsAny && actionAsAny.targetPluginID && typeof actionAsAny.type === 'number' && typeof actionAsAny.targetMode === 'number';
   }
 
   registerAction(action: ZLUX.Action): void {
