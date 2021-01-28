@@ -1059,7 +1059,7 @@ export enum RecognitionOp {
 
 export class RecognitionClause{
   operation: RecognitionOp;
-  subClauses: (RecognitionClause|number|string)[] = [];
+  subClauses: (RecognitionClause|number|string|string[])[] = [];
 
   constructor(op:RecognitionOp){
     this.operation = op;
@@ -1102,15 +1102,41 @@ export class RecognizerOr extends RecognitionClause {
   }
 }
 
+type PropertyName = string | string[];
+
 export class RecognizerProperty extends RecognitionClause {
-  constructor(propertyName:string, propertyValue:string|number){
+  constructor(propertyName: PropertyName, propertyValue:string|number){
     super(RecognitionOp.PROPERTY_EQ);
     this.subClauses[0] = propertyName;
     this.subClauses[1] = propertyValue;
   }
 
   match(applicationContext:any):boolean{
-    return applicationContext[this.subClauses[0] as string] == this.subClauses[1];
+    const propertyName = this.subClauses[0] as PropertyName;
+    const propertyValue = RecognizerProperty.getPropertyValue(applicationContext, propertyName);
+    return propertyValue == this.subClauses[1];
+  }
+  
+  private static getPropertyValue(applicationContext: any, propertyName: PropertyName): any {
+    if (Array.isArray(propertyName)) {
+      return RecognizerProperty.getNestedPropertyValue(applicationContext, propertyName);
+    }
+    return RecognizerProperty.getDirectPropertyValue(applicationContext, propertyName);
+  }
+  
+  private static getNestedPropertyValue(applicationContext: any, propertyName: string[]): any {
+    let context = applicationContext;
+    for (const part of propertyName) {
+      if (typeof context !== 'object') {
+        return undefined;
+      }
+      context = context[part];
+    }
+    return context;
+  }
+  
+  private static getDirectPropertyValue(applicationContext: any, propertyName: string): any {
+    return applicationContext[propertyName];
   }
 }
 
