@@ -228,6 +228,7 @@ declare namespace ZLUX {
     rasUri(uri: string): string;
     serverRootUri(uri: string): string;
     pluginResourceUri(pluginDefinition: Plugin, relativePath: string): string;
+    pluginIframeUri(pluginDefinition: Plugin, relativePath: string): string;
     pluginListUri(pluginType?: PluginType, update?:boolean): string;
     pluginConfigForScopeUri(pluginDefinition: ZLUX.Plugin, scope: string, resourcePath: string, resourceName?: string): string;
     /**
