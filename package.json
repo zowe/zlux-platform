@@ -5,12 +5,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "test:all": "ts-mocha -p ./base/tsconfig.test.json ./base/**/*.spec.ts"
   },
   "keywords": [],
   "author": "",
   "devDependencies": {
+    "@types/chai": "~4.2.14",
+    "@types/mocha": "~8.2.0",
+    "@types/node": "~14.14.22",
+    "chai": "~4.2.0",
+    "mocha": "~4.0.0",
     "rxjs": "~6.2.2",
-    "rxjs-compat": "~6.2.2"
+    "rxjs-compat": "~6.2.2",
+    "ts-mocha": "~6.0.0",
+    "typescript": "~3.0.0"
   }
 }
