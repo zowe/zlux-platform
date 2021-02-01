@@ -330,7 +330,6 @@ export class Dispatcher implements ZLUX.Dispatcher {
     if ((<ZLUX.RecognitionObjectOpClause>predicateObject).op) {
       const predicateOp: ZLUX.RecognitionObjectOpClause = <ZLUX.RecognitionObjectOpClause>predicateObject
       switch (predicateOp.op) {
-      case 'NOT':
       case 'AND':
       case 'OR':
         if (predicateOp.args) {
@@ -671,7 +670,6 @@ export class Dispatcher implements ZLUX.Dispatcher {
         if (!targetPluginID) {
           targetPluginID = actionAsAny.targetId;
         }
-        console.log("returning new action");
         return new Action(id, defaultName, targetMode, type, targetPluginID, primaryArgument);
     }
 
