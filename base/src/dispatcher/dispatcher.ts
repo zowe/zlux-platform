@@ -368,7 +368,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
      this.recognizers.push(recognitionRule);
      if (predicate.operation == RecognitionOp.AND){
        for (let subClause of predicate.subClauses){
-         if ((subClause as RecognitionClause).operation == RecognitionOp.PROPERTY_EQ || (subClause as RecognitionClause).operation == RecognitionOp.NOT){
+         if ((subClause as RecognitionClause).operation == RecognitionOp.PROPERTY_EQ){
            let propertyClause:RecognitionClause = subClause as RecognitionClause;
            let propertyName:string = propertyClause.subClauses[0] as string;
            let propertyValue:string|number = propertyClause.subClauses[1] as string|number;
