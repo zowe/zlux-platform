@@ -330,6 +330,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
     if ((<ZLUX.RecognitionObjectOpClause>predicateObject).op) {
       const predicateOp: ZLUX.RecognitionObjectOpClause = <ZLUX.RecognitionObjectOpClause>predicateObject
       switch (predicateOp.op) {
+      case 'NOT':
       case 'AND':
       case 'OR':
         if (predicateOp.args) {
@@ -361,7 +362,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
      this.recognizers.push(recognitionRule);
      if (predicate.operation == RecognitionOp.AND){
        for (let subClause of predicate.subClauses){
-         if ((subClause as RecognitionClause).operation == RecognitionOp.PROPERTY_EQ){
+         if ((subClause as RecognitionClause).operation == RecognitionOp.PROPERTY_EQ || (subClause as RecognitionClause).operation == RecognitionOp.NOT){
            let propertyClause:RecognitionClause = subClause as RecognitionClause;
            let propertyName:string = propertyClause.subClauses[0] as string;
            let propertyValue:string|number = propertyClause.subClauses[1] as string|number;
@@ -670,6 +671,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
         if (!targetPluginID) {
           targetPluginID = actionAsAny.targetId;
         }
+        console.log("returning new action");
         return new Action(id, defaultName, targetMode, type, targetPluginID, primaryArgument);
     }
 
@@ -1099,6 +1101,18 @@ export class RecognizerOr extends RecognitionClause {
       }
     }
     return false;
+  }
+}
+
+export class RecognizerNot extends RecognitionClause {
+  constructor(propertyName:string, propertyValue:string|number){
+    super(RecognitionOp.NOT);
+    this.subClauses[0] = propertyName;
+    this.subClauses[1] = propertyValue;
+  }
+
+  match(applicationContext:any):boolean{
+    return applicationContext[this.subClauses[0] as string] != this.subClauses[1];
   }
 }
 
