@@ -330,6 +330,13 @@ export class Dispatcher implements ZLUX.Dispatcher {
     if ((<ZLUX.RecognitionObjectOpClause>predicateObject).op) {
       const predicateOp: ZLUX.RecognitionObjectOpClause = <ZLUX.RecognitionObjectOpClause>predicateObject
       switch (predicateOp.op) {
+      case 'NOT':
+        if(predicateOp.args && predicateOp.args.length != 1){
+          const predicateProp: ZLUX.RecognitionObjectPropClause = <ZLUX.RecognitionObjectPropClause> (predicateOp.args as any)[0].prop;
+          return new RecognizerNot(predicateProp.prop[0],predicateProp.prop[1]);
+        } else {
+          throw new Error(`ZWED5020E - NOT is a unary recognizer op and only requires one arg.`);
+        }
       case 'AND':
       case 'OR':
         if (predicateOp.args) {
