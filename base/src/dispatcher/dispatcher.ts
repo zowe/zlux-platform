@@ -355,9 +355,13 @@ export class Dispatcher implements ZLUX.Dispatcher {
       default:
         throw new Error(`ZWED5021E - Recognizer predicate op ${predicateOp.op} not supported`);
       }
-    } else if ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop && ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop.length == 2)) {
+    } else if ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop && ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop.length >= 2)) {
       const predicateProp: ZLUX.RecognitionObjectPropClause = <ZLUX.RecognitionObjectPropClause> predicateObject;
-      return new RecognizerProperty(predicateProp.prop[0],predicateProp.prop[1]);
+      if ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop.length == 2){
+        return new RecognizerProperty(predicateProp.prop[0],predicateProp.prop[1]);
+      } else {
+        return new RecognizerProperty(...predicateProp.prop);
+      }
     } else {
       throw new Error('ZWED5022E - Error in recognizer definition');
     }
