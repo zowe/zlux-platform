@@ -350,11 +350,12 @@ export class Dispatcher implements ZLUX.Dispatcher {
       }
     } else if ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop && ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop.length >= 2)) {
       const predicateProp: ZLUX.RecognitionObjectPropClause = <ZLUX.RecognitionObjectPropClause> predicateObject;
-      if ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop.length == 2){
-        return new RecognizerProperty(predicateProp.prop[0],predicateProp.prop[1]);
-      } else {
-        return new RecognizerProperty(...predicateProp.prop);
-      }
+      return new RecognizerProperty(...predicateProp.prop);
+      // if ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop.length == 2){
+      //   return new RecognizerProperty(predicateProp.prop[0],predicateProp.prop[1]);
+      // } else {
+      //   return new RecognizerProperty(predicateProp.prop[0],predicateProp.prop[1], predicateProp.prop[2]);
+      // }
     } else {
       throw new Error('ZWED5022E - Error in recognizer definition');
     }
@@ -1109,16 +1110,34 @@ export class RecognizerOr extends RecognitionClause {
 type PropertyName = string | string[];
 
 export class RecognizerProperty extends RecognitionClause {
-  constructor(propertyName: PropertyName, propertyValue:string|number){
-    super(RecognitionOp.PROPERTY_EQ);
-    this.subClauses[0] = propertyName;
-    this.subClauses[1] = propertyValue;
+  constructor(...args:(RecognitionClause|number|string)[]){
+    switch(args.length){
+      case 3:
+        const op = args[0] as keyof typeof RecognitionOp;
+        super(RecognitionOp[op]);
+        break;
+      case 2:
+      default:
+        super(RecognitionOp.PROPERTY_EQ);
+        break;
+    }
+    this.subClauses = args;
   }
 
   match(applicationContext:any):boolean{
-    const propertyName = this.subClauses[0] as PropertyName;
-    const propertyValue = RecognizerProperty.getPropertyValue(applicationContext, propertyName);
-    return propertyValue == this.subClauses[1];
+    let propertyName, propertyValue;
+    switch(this.operation){
+      case RecognitionOp.NOT:
+        propertyName = this.subClauses[1] as PropertyName;
+        propertyValue = RecognizerProperty.getPropertyValue(applicationContext, propertyName);
+        return propertyValue != this.subClauses[2];
+      case RecognitionOp.PROPERTY_EQ:
+      default:
+        propertyName = this.subClauses[0] as PropertyName;
+        propertyValue = RecognizerProperty.getPropertyValue(applicationContext, propertyName);
+        return propertyValue == this.subClauses[1];
+    }
+    
   }
   
   private static getPropertyValue(applicationContext: any, propertyName: PropertyName): any {

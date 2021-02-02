@@ -46,6 +46,12 @@ describe('Recognizer', () => {
       const context = { a: 456 };
       expect(property.match(context)).to.false;
     });
+
+    it(`should return true for not equals`, () => {
+      const property = new RecognizerProperty('NOT', 'a', 123);
+      const context = { a: 456 };
+      expect(property.match(context)).to.true;
+    });
   });
 
   describe('Recognizer Properties using Dispatcher', () => {
