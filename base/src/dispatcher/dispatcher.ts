@@ -351,11 +351,6 @@ export class Dispatcher implements ZLUX.Dispatcher {
     } else if ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop && ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop.length >= 2)) {
       const predicateProp: ZLUX.RecognitionObjectPropClause = <ZLUX.RecognitionObjectPropClause> predicateObject;
       return new RecognizerProperty(...predicateProp.prop);
-      // if ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop.length == 2){
-      //   return new RecognizerProperty(predicateProp.prop[0],predicateProp.prop[1]);
-      // } else {
-      //   return new RecognizerProperty(predicateProp.prop[0],predicateProp.prop[1], predicateProp.prop[2]);
-      // }
     } else {
       throw new Error('ZWED5022E - Error in recognizer definition');
     }
