@@ -1052,6 +1052,7 @@ export enum RecognitionOp {
   AND,
   OR,
   NOT,
+  NE,
   PROPERTY_EQ,        
   SOURCE_PLUGIN_TYPE,      // syntactic sugar
   MIME_TYPE,        // ditto
@@ -1122,7 +1123,7 @@ export class RecognizerProperty extends RecognitionClause {
   match(applicationContext:any):boolean{
     let propertyName, propertyValue;
     switch(this.operation){
-      case RecognitionOp.NOT:
+      case RecognitionOp.NE:
         propertyName = this.subClauses[1] as PropertyName;
         propertyValue = RecognizerProperty.getPropertyValue(applicationContext, propertyName);
         return propertyValue != this.subClauses[2];
