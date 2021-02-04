@@ -48,9 +48,14 @@ describe('Recognizer', () => {
     });
 
     it(`should return true for not equals`, () => {
-      const property = new RecognizerProperty('NOT', 'a', 123);
+      const property = new RecognizerProperty('NE', 'a', 123);
       const context = { a: 456 };
       expect(property.match(context)).to.true;
+    });
+
+    it(`should not accept bad operator`, () => {
+      const badRecognizerPropertyFn = () => new RecognizerProperty('BAD', 'a', 123);
+      expect(badRecognizerPropertyFn).to.throw('ZWED5023E');
     });
   });
 
@@ -88,6 +93,18 @@ describe('Recognizer', () => {
       dispatcher.addRecognizer(property, testAction.id);
       const result = dispatcher.getAbstractActions([], { a: { b: {} } });
       expect(result.actions).to.undefined;
+    });
+    it(`shouldn't find action for recognizer with NE operator property`, () => {
+      const property = new RecognizerProperty('NE', 'a', 123);
+      dispatcher.addRecognizer(property, testAction.id);
+      const result = dispatcher.getAbstractActions([], { a: 123 });
+      expect(result.actions).to.undefined;
+    });
+    it(`should find action for recognizer with NE operator property`, () => {
+      const property = new RecognizerProperty('NE', 'a', 666);
+      dispatcher.addRecognizer(property, testAction.id);
+      const result = dispatcher.getAbstractActions([], { a: 123 });
+      expect(result.actions).to.eql([testAction]);
     });
   })
 });
