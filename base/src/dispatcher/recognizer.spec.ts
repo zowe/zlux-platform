@@ -129,6 +129,12 @@ describe('Recognizer', () => {
       const badRecognizerPropertyFn = () => new RecognizerProperty('BAD', 'a', 123);
       expect(badRecognizerPropertyFn).to.throw('ZWED5023E');
     });
+    
+    it(`should match array length`, () => {
+      const property = new RecognizerProperty(['a', 'length'], 3);
+      const context = { a: [0, 1, 2] };
+      expect(property.match(context)).to.true;
+    });
   });
 
   describe('Recognizer Properties using Dispatcher', () => {
