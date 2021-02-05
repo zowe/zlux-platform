@@ -348,9 +348,9 @@ export class Dispatcher implements ZLUX.Dispatcher {
       default:
         throw new Error(`ZWED5021E - Recognizer predicate op ${predicateOp.op} not supported`);
       }
-    } else if ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop && ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop.length == 2)) {
+    } else if ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop && ((<ZLUX.RecognitionObjectPropClause>predicateObject).prop.length >= 2)) {
       const predicateProp: ZLUX.RecognitionObjectPropClause = <ZLUX.RecognitionObjectPropClause> predicateObject;
-      return new RecognizerProperty(predicateProp.prop[0],predicateProp.prop[1]);
+      return new RecognizerProperty(...predicateProp.prop);
     } else {
       throw new Error('ZWED5022E - Error in recognizer definition');
     }
@@ -361,7 +361,8 @@ export class Dispatcher implements ZLUX.Dispatcher {
      this.recognizers.push(recognitionRule);
      if (predicate.operation == RecognitionOp.AND){
        for (let subClause of predicate.subClauses){
-         if ((subClause as RecognitionClause).operation == RecognitionOp.PROPERTY_EQ){
+         const operation = (subClause as RecognitionClause).operation;
+         if (operation === RecognitionOp.PROPERTY_EQ || operation === RecognitionOp.PROPERTY_NE || operation === RecognitionOp.PROPERTY_LT || operation === RecognitionOp.PROPERTY_GT){
            let propertyClause:RecognitionClause = subClause as RecognitionClause;
            let propertyName:string = propertyClause.subClauses[0] as string;
            let propertyValue:string|number = propertyClause.subClauses[1] as string|number;
@@ -1053,6 +1054,9 @@ export enum RecognitionOp {
   OR,
   NOT,
   PROPERTY_EQ,        
+  PROPERTY_NE,
+  PROPERTY_LT,
+  PROPERTY_GT ,
   SOURCE_PLUGIN_TYPE,      // syntactic sugar
   MIME_TYPE,        // ditto
 }
@@ -1105,16 +1109,49 @@ export class RecognizerOr extends RecognitionClause {
 type PropertyName = string | string[];
 
 export class RecognizerProperty extends RecognitionClause {
-  constructor(propertyName: PropertyName, propertyValue:string|number){
-    super(RecognitionOp.PROPERTY_EQ);
-    this.subClauses[0] = propertyName;
-    this.subClauses[1] = propertyValue;
+  constructor(...args:(RecognitionClause|number|string|string[])[]){
+    if(args.length == 3){
+        const op = args[0] as string;
+        switch (op) {
+          case 'NE':
+            super(RecognitionOp.PROPERTY_NE);
+            break;
+          case 'LT':
+            super(RecognitionOp.PROPERTY_LT);
+            break;
+          case 'GT':
+            super(RecognitionOp.PROPERTY_GT);
+            break;
+          case 'EQ':
+            super(RecognitionOp.PROPERTY_EQ);
+            break;
+          default:
+            super(RecognitionOp.PROPERTY_EQ);
+            throw new Error(`ZWED5023E - Unknown operator '${op}' in recognition clause ${JSON.stringify(args)})`);
+        }
+        args.shift(); // omit operator
+      } else {
+        super(RecognitionOp.PROPERTY_EQ);
+      }
+    this.subClauses = args;
   }
 
   match(applicationContext:any):boolean{
     const propertyName = this.subClauses[0] as PropertyName;
     const propertyValue = RecognizerProperty.getPropertyValue(applicationContext, propertyName);
-    return propertyValue == this.subClauses[1];
+    const targetValue = this.subClauses[1];
+    switch(this.operation){
+      case RecognitionOp.PROPERTY_NE:
+        return propertyValue != targetValue;
+      case RecognitionOp.PROPERTY_LT:
+        return propertyValue < targetValue;
+      case RecognitionOp.PROPERTY_GT:
+        return propertyValue > targetValue;
+      case RecognitionOp.PROPERTY_EQ:
+      default:
+        return propertyValue == targetValue;
+    }
+    
   }
   
   private static getPropertyValue(applicationContext: any, propertyName: PropertyName): any {
