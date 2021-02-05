@@ -46,6 +46,12 @@ describe('Recognizer', () => {
       const context = { a: 456 };
       expect(property.match(context)).to.false;
     });
+    
+    it(`should match array length`, () => {
+      const property = new RecognizerProperty(['a', 'length'], 3);
+      const context = { a: [0, 1, 2] };
+      expect(property.match(context)).to.true;
+    });
   });
 
   describe('Recognizer Properties using Dispatcher', () => {
