@@ -1055,6 +1055,8 @@ export enum RecognitionOp {
   NOT,
   PROPERTY_EQ,        
   PROPERTY_NE,
+  PROPERTY_LT,
+  PROPERTY_GT ,
   SOURCE_PLUGIN_TYPE,      // syntactic sugar
   MIME_TYPE,        // ditto
 }
@@ -1108,23 +1110,29 @@ type PropertyName = string | string[];
 
 export class RecognizerProperty extends RecognitionClause {
   constructor(...args:(RecognitionClause|number|string|string[])[]){
-    switch(args.length){
-      case 3:
+    if(args.length == 3){
         const op = args[0] as string;
-        if (op === 'NE') {
-          super(RecognitionOp.PROPERTY_NE);
-        } else if (op === 'EQ') {
-          super(RecognitionOp.PROPERTY_EQ);
-        }else {
-          throw new Error(`ZWED5023E - Unknown operator '${op}' in recognition clause ${JSON.stringify(args)})`);
+        switch (op) {
+          case 'NE':
+            super(RecognitionOp.PROPERTY_NE);
+            break;
+          case 'LT':
+            super(RecognitionOp.PROPERTY_LT);
+            break;
+          case 'GT':
+            super(RecognitionOp.PROPERTY_GT);
+            break;
+          case 'EQ':
+            super(RecognitionOp.PROPERTY_EQ);
+            break;
+          default:
+            super(RecognitionOp.PROPERTY_EQ);
+            throw new Error(`ZWED5023E - Unknown operator '${op}' in recognition clause ${JSON.stringify(args)})`);
         }
         args.shift(); // omit operator
-        break;
-      case 2:
-      default:
+      } else {
         super(RecognitionOp.PROPERTY_EQ);
-        break;
-    }
+      }
     this.subClauses = args;
   }
 
@@ -1135,6 +1143,10 @@ export class RecognizerProperty extends RecognitionClause {
     switch(this.operation){
       case RecognitionOp.PROPERTY_NE:
         return propertyValue != targetValue;
+      case RecognitionOp.PROPERTY_LT:
+        return propertyValue < targetValue;
+      case RecognitionOp.PROPERTY_GT:
+        return propertyValue > targetValue;
       case RecognitionOp.PROPERTY_EQ:
       default:
         return propertyValue == targetValue;
