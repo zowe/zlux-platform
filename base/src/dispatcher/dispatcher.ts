@@ -362,7 +362,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
      if (predicate.operation == RecognitionOp.AND){
        for (let subClause of predicate.subClauses){
          const operation = (subClause as RecognitionClause).operation;
-         if (operation === RecognitionOp.PROPERTY_EQ || operation === RecognitionOp.PROPERTY_NE){
+         if (operation === RecognitionOp.PROPERTY_EQ || operation === RecognitionOp.PROPERTY_NE || operation === RecognitionOp.PROPERTY_LT || operation === RecognitionOp.PROPERTY_GT){
            let propertyClause:RecognitionClause = subClause as RecognitionClause;
            let propertyName:string = propertyClause.subClauses[0] as string;
            let propertyValue:string|number = propertyClause.subClauses[1] as string|number;
