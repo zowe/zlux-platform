@@ -5,8 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0",
-    "test:all": "ts-mocha -p ./base/tsconfig.test.json ./base/**/*.spec.ts"
+    "test": "ts-mocha -p ./base/tsconfig.test.json ./base/**/*.spec.ts"
   },
   "keywords": [],
   "author": "",
