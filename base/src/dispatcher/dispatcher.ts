@@ -362,7 +362,9 @@ export class Dispatcher implements ZLUX.Dispatcher {
      if (predicate.operation == RecognitionOp.AND){
        for (let subClause of predicate.subClauses){
          const operation = (subClause as RecognitionClause).operation;
-         if (operation === RecognitionOp.PROPERTY_EQ || operation === RecognitionOp.PROPERTY_NE || operation === RecognitionOp.PROPERTY_LT || operation === RecognitionOp.PROPERTY_GT){
+         if (operation === RecognitionOp.PROPERTY_EQ || operation === RecognitionOp.PROPERTY_NE 
+          || operation === RecognitionOp.PROPERTY_LT || operation === RecognitionOp.PROPERTY_GT
+          || operation === RecognitionOp.PROPERTY_LTE || operation === RecognitionOp.PROPERTY_GTE){
            let propertyClause:RecognitionClause = subClause as RecognitionClause;
            let propertyName:string = propertyClause.subClauses[0] as string;
            let propertyValue:string|number = propertyClause.subClauses[1] as string|number;
@@ -1056,7 +1058,9 @@ export enum RecognitionOp {
   PROPERTY_EQ,        
   PROPERTY_NE,
   PROPERTY_LT,
-  PROPERTY_GT ,
+  PROPERTY_GT,
+  PROPERTY_LTE,
+  PROPERTY_GTE,
   SOURCE_PLUGIN_TYPE,      // syntactic sugar
   MIME_TYPE,        // ditto
 }
@@ -1122,6 +1126,12 @@ export class RecognizerProperty extends RecognitionClause {
           case 'GT':
             super(RecognitionOp.PROPERTY_GT);
             break;
+          case 'LTE':
+            super(RecognitionOp.PROPERTY_LTE);
+            break;
+          case 'GTE':
+            super(RecognitionOp.PROPERTY_GTE);
+            break;
           case 'EQ':
             super(RecognitionOp.PROPERTY_EQ);
             break;
@@ -1147,6 +1157,10 @@ export class RecognizerProperty extends RecognitionClause {
         return propertyValue < targetValue;
       case RecognitionOp.PROPERTY_GT:
         return propertyValue > targetValue;
+        case RecognitionOp.PROPERTY_LTE:
+          return propertyValue <= targetValue;
+        case RecognitionOp.PROPERTY_GTE:
+          return propertyValue >= targetValue;
       case RecognitionOp.PROPERTY_EQ:
       default:
         return propertyValue == targetValue;

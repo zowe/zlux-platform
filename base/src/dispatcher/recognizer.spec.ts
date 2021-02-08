@@ -125,6 +125,29 @@ describe('Recognizer', () => {
       expect(property.match(context)).to.false;
     });
 
+    it(`should return true for GTE (type=number)`, () => {
+      const property = new RecognizerProperty('GTE', 'a', 123);
+      const context = { a: 123 };
+      expect(property.match(context)).to.true;
+    });
+
+    it(`should return true for LTE (type=number)`, () => {
+      const property = new RecognizerProperty('LTE', 'a', 456);
+      const context = { a: 456 };
+      expect(property.match(context)).to.true;
+    });
+
+    it(`should return true for GTE (type=string)`, () => {
+      const property = new RecognizerProperty('GTE', 'a', "abb");
+      const context = { a: "abc" };
+      expect(property.match(context)).to.true;
+    });
+    it(`should return true for less than (type=string)`, () => {
+      const property = new RecognizerProperty('LTE', 'a', "abc");
+      const context = { a: "abb" };
+      expect(property.match(context)).to.true;
+    });
+
     it(`should not accept bad operator`, () => {
       const badRecognizerPropertyFn = () => new RecognizerProperty('BAD', 'a', 123);
       expect(badRecognizerPropertyFn).to.throw('ZWED5023E');
