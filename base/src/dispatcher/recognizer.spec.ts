@@ -125,25 +125,25 @@ describe('Recognizer', () => {
       expect(property.match(context)).to.false;
     });
 
-    it(`should return true for GTE (type=number)`, () => {
-      const property = new RecognizerProperty('GTE', 'a', 123);
+    it(`should return true for GE (type=number)`, () => {
+      const property = new RecognizerProperty('GE', 'a', 123);
       const context = { a: 123 };
       expect(property.match(context)).to.true;
     });
 
-    it(`should return true for LTE (type=number)`, () => {
-      const property = new RecognizerProperty('LTE', 'a', 456);
+    it(`should return true for LE (type=number)`, () => {
+      const property = new RecognizerProperty('LE', 'a', 456);
       const context = { a: 456 };
       expect(property.match(context)).to.true;
     });
 
-    it(`should return true for GTE (type=string)`, () => {
-      const property = new RecognizerProperty('GTE', 'a', "abb");
+    it(`should return true for GE (type=string)`, () => {
+      const property = new RecognizerProperty('GE', 'a', "abb");
       const context = { a: "abc" };
       expect(property.match(context)).to.true;
     });
-    it(`should return true for LTE (type=string)`, () => {
-      const property = new RecognizerProperty('LTE', 'a', "abc");
+    it(`should return true for LE (type=string)`, () => {
+      const property = new RecognizerProperty('LE', 'a', "abc");
       const context = { a: "abb" };
       expect(property.match(context)).to.true;
     });
