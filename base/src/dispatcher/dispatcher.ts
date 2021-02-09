@@ -364,7 +364,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
          const operation = (subClause as RecognitionClause).operation;
          if (operation === RecognitionOp.PROPERTY_EQ || operation === RecognitionOp.PROPERTY_NE 
           || operation === RecognitionOp.PROPERTY_LT || operation === RecognitionOp.PROPERTY_GT
-          || operation === RecognitionOp.PROPERTY_LTE || operation === RecognitionOp.PROPERTY_GTE){
+          || operation === RecognitionOp.PROPERTY_LE || operation === RecognitionOp.PROPERTY_GE){
            let propertyClause:RecognitionClause = subClause as RecognitionClause;
            let propertyName:string = propertyClause.subClauses[0] as string;
            let propertyValue:string|number = propertyClause.subClauses[1] as string|number;
@@ -1059,8 +1059,8 @@ export enum RecognitionOp {
   PROPERTY_NE,
   PROPERTY_LT,
   PROPERTY_GT,
-  PROPERTY_LTE,
-  PROPERTY_GTE,
+  PROPERTY_LE,
+  PROPERTY_GE,
   SOURCE_PLUGIN_TYPE,      // syntactic sugar
   MIME_TYPE,        // ditto
 }
@@ -1127,10 +1127,10 @@ export class RecognizerProperty extends RecognitionClause {
             super(RecognitionOp.PROPERTY_GT);
             break;
           case 'LTE':
-            super(RecognitionOp.PROPERTY_LTE);
+            super(RecognitionOp.PROPERTY_LE);
             break;
           case 'GTE':
-            super(RecognitionOp.PROPERTY_GTE);
+            super(RecognitionOp.PROPERTY_GE);
             break;
           case 'EQ':
             super(RecognitionOp.PROPERTY_EQ);
@@ -1157,9 +1157,9 @@ export class RecognizerProperty extends RecognitionClause {
         return propertyValue < targetValue;
       case RecognitionOp.PROPERTY_GT:
         return propertyValue > targetValue;
-        case RecognitionOp.PROPERTY_LTE:
+        case RecognitionOp.PROPERTY_LE:
           return propertyValue <= targetValue;
-        case RecognitionOp.PROPERTY_GTE:
+        case RecognitionOp.PROPERTY_GE:
           return propertyValue >= targetValue;
       case RecognitionOp.PROPERTY_EQ:
       default:
