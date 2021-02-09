@@ -142,7 +142,7 @@ describe('Recognizer', () => {
       const context = { a: "abc" };
       expect(property.match(context)).to.true;
     });
-    it(`should return true for less than (type=string)`, () => {
+    it(`should return true for LTE (type=string)`, () => {
       const property = new RecognizerProperty('LTE', 'a', "abc");
       const context = { a: "abb" };
       expect(property.match(context)).to.true;
