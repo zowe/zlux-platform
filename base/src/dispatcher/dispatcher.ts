@@ -1126,10 +1126,10 @@ export class RecognizerProperty extends RecognitionClause {
           case 'GT':
             super(RecognitionOp.PROPERTY_GT);
             break;
-          case 'LTE':
+          case 'LE':
             super(RecognitionOp.PROPERTY_LE);
             break;
-          case 'GTE':
+          case 'GE':
             super(RecognitionOp.PROPERTY_GE);
             break;
           case 'EQ':
