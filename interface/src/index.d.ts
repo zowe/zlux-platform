@@ -163,6 +163,16 @@ declare namespace ZLUX {
     applicationContext: any;
   }
 
+  interface AgentAPIMLConfig {
+    serviceName: string;
+    serviceVersion?: string;
+    enabled: boolean;
+  }
+
+  interface AgentConfig {
+    mediationLayer?: AgentAPIMLConfig;
+  }
+
   interface Environment {
     //should cache
     get(key:string): Promise<string|undefined>;
@@ -171,6 +181,7 @@ declare namespace ZLUX {
     getGatewayPort(): Promise<number|undefined>;
     getGatewayHost(): Promise<string|undefined>;
     getPlatform(): Promise<string>;
+    getAgentConfig(): Promise<AgentConfig|undefined>;
     getArch(): Promise<string>;
     //should poll server
     getTime(): Promise<Date>;
@@ -239,6 +250,7 @@ declare namespace ZLUX {
                ): string;
     omvsSegmentUri(): string;
     rasUri(uri: string): string;
+    agentRootUri(uri: string): string;
     serverRootUri(uri: string): string;
     pluginResourceUri(pluginDefinition: Plugin, relativePath: string): string;
     pluginIframeUri(pluginDefinition: Plugin, relativePath: string): string;

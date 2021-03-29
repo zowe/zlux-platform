@@ -22,47 +22,61 @@
 
 // <reference types="ZLUX" />
 
+
+
 type EnvironmentResponse = {
   timestamp: Date,
   platform: string,
   arch: string,
-  userEnvironment: any
+  userEnvironment: any,
+  agent: ZLUX.AgentConfig
 }
 
 export class Environment implements ZLUX.Environment {
   private _cache:EnvironmentResponse|undefined = undefined;
     //should cache
   get(key:string): Promise<string|undefined> {
-    return new Promise((resolve)=> {
+    return new Promise((resolve, reject)=> {
       this._queryServer().then(function (cache:EnvironmentResponse){
         resolve(cache.userEnvironment[key]);
-      });
+      }).catch((err)=>{reject(err);});
     });
   }
   getComponentGroups(): Promise<string[]|undefined> {
-    return new Promise((resolve)=> {
+    return new Promise((resolve, reject)=> {
       this._queryServer().then(function (cache:EnvironmentResponse){
         try {
           resolve(cache.userEnvironment.LAUNCH_COMPONENT_GROUPS.split(','));
         } catch (e) {
           resolve(undefined);
         }
-      });
+      }).catch((err)=>{reject(err);});
     });
   }
   getExternalComponents(): Promise<string[]|undefined> {
-    return new Promise((resolve)=> {
+    return new Promise((resolve, reject)=> {
       this._queryServer().then(function (cache:EnvironmentResponse){
         try {
           resolve(cache.userEnvironment.EXTERNAL_COMPONENTS.split(','));
         } catch (e) {
           resolve(undefined);
         }
-      });
+      }).catch((err)=>{reject(err);});
+    });
+  }
+  getAgentConfig(): Promise<ZLUX.AgentConfig|undefined> {
+    return new Promise((resolve, reject)=> {
+      this._queryServer().then(function (cache:EnvironmentResponse){
+        try {
+          resolve(cache.agent);
+        } catch (e) {
+          resolve(undefined);
+        }
+      }).catch((err)=>{reject(err);});
     });
   }
   getGatewayPort(): Promise<number|undefined> {
-    return new Promise((resolve)=> {
+    return new Promise((resolve, reject)=> {
       this._queryServer().then(function (cache:EnvironmentResponse){
         try {
           const portString = cache.userEnvironment.ZWED_node_mediationLayer_server_gatewayPort
@@ -73,11 +87,11 @@ export class Environment implements ZLUX.Environment {
         } catch (e) {
           resolve(undefined);
         }
-      });
+      }).catch((err)=>{reject(err);});
     });
   }
   getGatewayHost(): Promise<string|undefined> {
-    return new Promise((resolve)=> {
+    return new Promise((resolve, reject)=> {
       this._queryServer().then(function (cache:EnvironmentResponse){
         try {
           const uri_prefix = window.location.pathname.split('ZLUX/plugins/')[0];
@@ -95,27 +109,27 @@ export class Environment implements ZLUX.Environment {
         } catch (e) {
           resolve(undefined);
         }
-      });
+      }).catch((err)=>{reject(err);});
     });
   }
   getPlatform(): Promise<string> {
-    return new Promise((resolve)=> {
+    return new Promise((resolve, reject)=> {
       this._queryServer().then(function (cache:EnvironmentResponse){
         resolve(cache.platform);
-      });
+      }).catch((err)=>{reject(err);});
     });
   }
   getArch(): Promise<string> {
-    return new Promise((resolve)=> {
+    return new Promise((resolve, reject)=> {
       this._queryServer().then(function (cache:EnvironmentResponse){
         resolve(cache.arch);
-      });
+      }).catch((err)=>{reject(err);});
     });
   }
     //should poll server
   getTime(): Promise<Date> {
-    return new Promise((resolve)=> {
-      this._queryServer(false).then(response => resolve(new Date(response.timestamp)));
+    return new Promise((resolve, reject)=> {
+      this._queryServer(false).then(response => resolve(new Date(response.timestamp))).catch((err)=>{reject(err);});
     });
   }
 
@@ -140,16 +154,17 @@ export class Environment implements ZLUX.Environment {
             }
             break;
           default:
-              reject(request.responseText)
-              break;
-            }
+            reject({responseText: request.responseText, status: request.status});
+            break;
           }
-        };
-        //chicken-and-egg problem, not a good idea to use uribroker here. slight duplication.
-        const uri_prefix = window.location.pathname.split('ZLUX/plugins/')[0];
-        
-        request.open("GET", `${uri_prefix}server/environment`, true);
-        request.send();
+        }
+      };
+      
+      //chicken-and-egg problem, not a good idea to use uribroker here. slight duplication.
+      const uri_prefix = window.location.pathname.split('ZLUX/plugins/')[0];
+      
+      request.open("GET", `${uri_prefix}server/environment`, true);
+      request.send();
     });
   }
 }
