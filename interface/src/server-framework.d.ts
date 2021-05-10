@@ -1,5 +1,3 @@
-import { Router } from 'express';
-
 declare namespace ZLUXServerFramework {
 
     export interface Capabilities {
@@ -45,7 +43,7 @@ declare namespace ZLUXServerFramework {
     export interface DataServiceContext {
       storage: PluginStorage;
       logger:  ZLUX.ComponentLogger;
-      addBodyParseMiddleware: (router: Router) => void;
+      addBodyParseMiddleware: (router: any) => void;
     }
     
 }
