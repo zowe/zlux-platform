@@ -163,6 +163,31 @@ declare namespace ZLUX {
     applicationContext: any;
   }
 
+  interface AgentAPIMLConfig {
+    serviceName: string;
+    serviceVersion?: string;
+    enabled: boolean;
+  }
+
+  interface AgentConfig {
+    mediationLayer?: AgentAPIMLConfig;
+  }
+
+  interface Environment {
+    //should cache
+    get(key:string): Promise<string|undefined>;
+    getComponentGroups(): Promise<string[]|undefined>;
+    getExternalComponents(): Promise<string[]|undefined>;
+    getGatewayPort(): Promise<number|undefined>;
+    getGatewayHost(): Promise<string|undefined>;
+    getPlatform(): Promise<string>;
+    getAgentConfig(): Promise<AgentConfig|undefined>;
+    getArch(): Promise<string>;
+    //should poll server
+    getTime(): Promise<Date>;
+  }
+
+  
   interface ComponentLogger {
     log(minimumLevel: number, ...loggableItems:any[]): void;
     info(...loggableItems:any[]): void;
@@ -225,6 +250,7 @@ declare namespace ZLUX {
                ): string;
     omvsSegmentUri(): string;
     rasUri(uri: string): string;
+    agentRootUri(uri: string): string;
     serverRootUri(uri: string): string;
     pluginResourceUri(pluginDefinition: Plugin, relativePath: string): string;
     pluginIframeUri(pluginDefinition: Plugin, relativePath: string): string;
@@ -793,6 +819,7 @@ declare class ZoweZLUXResources {
   static pluginManager: any;
   static uriBroker: ZLUX.UriBroker;
   static dispatcher: ZLUX.Dispatcher;
+  static environment: ZLUX.Environment;
   static logger: ZLUX.Logger;
   static registry: ZLUX.Registry;
   //previously was NotificationManager
