@@ -18,6 +18,7 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
   private handlers: MVDHosting.ZoweNotificationWatcher[];
   private restUrl: string;
   public idCount: number;
+  private ws: WebSocket;
 
   constructor() {
     this.notificationCache = new Array<ZoweNotification>();
@@ -28,16 +29,16 @@ export class ZoweNotificationManager implements MVDHosting.ZoweNotificationManag
   _setURL(wsUrl: string, restUrl: string): void {
     if (!urlSet) {
       this.restUrl = restUrl;
-      let ws = new WebSocket(wsUrl);
+      this.ws = new WebSocket(wsUrl);
       var _this = this;
-      ws.onmessage = function(message) {
+      this.ws.onmessage = function(message) {
         _this.updateHandlers(JSON.parse(message.data)['notification']);
       }
-      ws.onclose = () => {
-        ws = new WebSocket(wsUrl)
+      this.ws.onclose = () => {
+        _this.ws = new WebSocket(wsUrl)
       }
-      ws.onerror = () => {
-        ws = new WebSocket(wsUrl)
+      this.ws.onerror = () => {
+        _this.ws = new WebSocket(wsUrl)
       }
       urlSet = true;
     }
