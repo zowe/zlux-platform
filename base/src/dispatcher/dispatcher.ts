@@ -416,7 +416,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
     
   private isConcreteAction(action: ZLUX.AbstractAction | undefined): boolean {
     const actionAsAny: any = action as any;
-    return actionAsAny && actionAsAny.targetPluginID && typeof actionAsAny.type === 'number' && typeof actionAsAny.targetMode === 'number';
+    return actionAsAny && actionAsAny.targetPluginID && typeof actionAsAny.type === 'string' && typeof actionAsAny.targetMode === 'string';
   }
 
   registerAction(action: ZLUX.Action): void {
@@ -673,15 +673,6 @@ export class Dispatcher implements ZLUX.Dispatcher {
         if (!targetPluginID) {
           targetPluginID = actionAsAny.targetId;
         }
-
-        if(typeof targetMode === 'string') {
-          targetMode = ZoweZLUX.dispatcher.constants.ActionTargetMode[targetMode];
-        }
-
-        if(typeof type === 'string') {
-          type = ZoweZLUX.dispatcher.constants.ActionType[type];
-        }
-
         return new Action(id, defaultName, targetMode, type, targetPluginID, primaryArgument);
     }
 
@@ -1201,22 +1192,22 @@ export class RecognizerProperty extends RecognitionClause {
 }
 
 export enum ActionTargetMode {
-  PluginCreate,                // require pluginType
-  PluginFindUniqueOrCreate,    // required AppInstance/ID
-  PluginFindAnyOrCreate,       // plugin type
+  PluginCreate = "PluginCreate",                         // require pluginType
+  PluginFindUniqueOrCreate = "PluginFindUniqueOrCreate", // required AppInstance/ID
+  PluginFindAnyOrCreate = "PluginFindAnyOrCreate",       // plugin type
   //should have PluginFindAnyOrFail
-  System,                      // something that is always present
+  System = "System",                                     // something that is always present
 }
 
 export enum ActionType {       // not all actions are meaningful for all target modes
-  Launch,                      // essentially do nothing after target mode
-  Focus,                       // bring to fore, but nothing else
-  Route,                       // sub-navigate or "route" in target
-  Message,                     // "onMessage" style event to plugin
-  Method,                      // Method call on instance, more strongly typed
-  Minimize,
-  Maximize,
-  Close,                       // may need to call a "close handler"
+  Launch = "Launch",           // essentially do nothing after target mode
+  Focus = "Focus",             // bring to fore, but nothing else
+  Route = "Route",             // sub-navigate or "route" in target
+  Message = "Message",         // "onMessage" style event to plugin
+  Method = "Method",           // Method call on instance, more strongly typed
+  Minimize = "Minimize",
+  Maximize = "Maximize",
+  Close = "Close",             // may need to call a "close handler"
 } 
   
 
