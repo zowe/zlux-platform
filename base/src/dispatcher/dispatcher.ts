@@ -673,6 +673,15 @@ export class Dispatcher implements ZLUX.Dispatcher {
         if (!targetPluginID) {
           targetPluginID = actionAsAny.targetId;
         }
+
+        if(typeof targetMode === 'string') {
+          targetMode = ZoweZLUX.dispatcher.constants.ActionTargetMode[targetMode];
+        }
+
+        if(typeof type === 'string') {
+          type = ZoweZLUX.dispatcher.constants.ActionType[type];
+        }
+
         return new Action(id, defaultName, targetMode, type, targetPluginID, primaryArgument);
     }
 
