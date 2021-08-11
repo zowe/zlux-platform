@@ -432,18 +432,6 @@ export class Dispatcher implements ZLUX.Dispatcher {
     }
 
     this.actionsByID.set(action.id, action);
-
-    if (action instanceof ActionContainer) {
-      const { children } = action as ActionContainer;
-
-      if (children && children.length > 0) {
-        for (let child of children) {
-          if (child instanceof AbstractAction) {
-            this.registerAbstractAction(child);
-          }
-        }
-      }
-    }
   }
 
   /**
