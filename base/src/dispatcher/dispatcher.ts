@@ -432,6 +432,18 @@ export class Dispatcher implements ZLUX.Dispatcher {
     }
 
     this.actionsByID.set(action.id, action);
+
+    if (action instanceof ActionContainer) {
+      const { children } = action as ActionContainer;  
+
+        if (children && children.length > 0) {
+          for (let child of children) {
+            if (child instanceof AbstractAction) {
+              this.registerAbstractAction(child);
+            }
+          }
+        }
+    }  
   }
 
   /**
@@ -642,7 +654,6 @@ export class Dispatcher implements ZLUX.Dispatcher {
               child = childIn as ZLUX.ActionReference;
             } else {
               child = this.makeActionFromObject(childIn as ZLUX.AbstractAction);
-              this.registerAbstractAction(child as ZLUX.AbstractAction);
             }
             children.push(child);
           }
