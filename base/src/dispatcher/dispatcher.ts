@@ -443,7 +443,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
           }
         }
       }
-    }  
+    }
   }
 
   /**
