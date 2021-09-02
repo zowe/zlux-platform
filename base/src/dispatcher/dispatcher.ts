@@ -654,7 +654,6 @@ export class Dispatcher implements ZLUX.Dispatcher {
               child = childIn as ZLUX.ActionReference;
             } else {
               child = this.makeActionFromObject(childIn as ZLUX.AbstractAction);
-              this.registerAbstractAction(child as ZLUX.AbstractAction);
             }
             children.push(child);
           }
