@@ -273,6 +273,7 @@ declare namespace ZLUX {
         relativePath: string, version?: string): string;
     pluginRESTUri(pluginDefinition: Plugin, serviceName: string, 
         relativePath: string, version?: string): string;
+    userInfoUri(): string;
   }
   
   interface PluginWatcher {
