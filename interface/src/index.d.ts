@@ -174,7 +174,7 @@ declare namespace ZLUX {
   interface Environment {
     //should cache
     get(key:string): Promise<string|undefined>;
-    getComponentGroups(): Promise<string[]|undefined>;
+    getComponents(): Promise<string[]|undefined>;
     getExternalComponents(): Promise<string[]|undefined>;
     getGatewayPort(): Promise<number|undefined>;
     getGatewayHost(): Promise<string|undefined>;
