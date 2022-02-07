@@ -42,11 +42,11 @@ export class Environment implements ZLUX.Environment {
       }).catch((err)=>{reject(err);});
     });
   }
-  getComponentGroups(): Promise<string[]|undefined> {
+  getComponents(): Promise<string[]|undefined> {
     return new Promise((resolve, reject)=> {
       this._queryServer().then(function (cache:EnvironmentResponse){
         try {
-          resolve(cache.userEnvironment.LAUNCH_COMPONENT_GROUPS.split(','));
+          resolve(cache.userEnvironment.ZWE_LAUNCH_COMPONENTS.split(','));
         } catch (e) {
           resolve(undefined);
         }
@@ -102,7 +102,7 @@ export class Environment implements ZLUX.Environment {
           else { //TODO what happens when there are multiple values
             const host = cache.userEnvironment.ZWED_node_mediationLayer_server_hostname
               ? cache.userEnvironment.ZWED_node_mediationLayer_server_hostname
-              : cache.userEnvironment.ZOWE_EXPLORER_HOST;
+              : cache.userEnvironment.ZWE_zowe_externalDomains_0;
             
             resolve(host);
           }

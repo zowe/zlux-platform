@@ -17,8 +17,6 @@
  */
 
 declare namespace ZLUX {
-  type Observable<T> = Rx.Observable<T>;
-
   interface Dispatcher {
     /**
      * This is the interface that is called by the window manager or app manager to tell the
@@ -176,7 +174,7 @@ declare namespace ZLUX {
   interface Environment {
     //should cache
     get(key:string): Promise<string|undefined>;
-    getComponentGroups(): Promise<string[]|undefined>;
+    getComponents(): Promise<string[]|undefined>;
     getExternalComponents(): Promise<string[]|undefined>;
     getGatewayPort(): Promise<number|undefined>;
     getGatewayHost(): Promise<string|undefined>;
@@ -328,7 +326,7 @@ declare namespace ZLUX {
      * @param   target The DOM element into which the component should be constructed
      * @returns        An implementation of the instances corresponding to the capabilities offered by this component
      */
-    instantiateIntoDOM(target: HTMLElement): Rx.Observable<IComponent>;
+    instantiateIntoDOM(target: HTMLElement): Observable<IComponent>;
   }
 
   /**
@@ -575,7 +573,7 @@ declare namespace ZLUX {
      * @param   targetBuffer The buffer into which the file should be opened, or null to open a new buffer
      * @returns              An observable that pushes a handle to the buffer into which the file was opened
      */
-    openFile(file: string, targetBuffer: EditorBufferHandle | null): Rx.Observable<EditorBufferHandle>;
+    openFile(file: string, targetBuffer: EditorBufferHandle | null): Observable<EditorBufferHandle>;
 
     /**
      * Save a buffer into a file.
@@ -584,7 +582,7 @@ declare namespace ZLUX {
      * @param   path    The path of the file into which the buffer should be saved, or null if the buffer is already associated with a file
      * @returns         An observable that pushes when the file has been saved
      */
-    saveBuffer(buffer: EditorBufferHandle, path: string | null): Rx.Observable<void>;
+    saveBuffer(buffer: EditorBufferHandle, path: string | null): Observable<void>;
 
     /**
      * Get the contents of a buffer.
@@ -592,7 +590,7 @@ declare namespace ZLUX {
      * @param   buffer  The buffer that should be read
      * @returns         An observable that pushes the contents of the buffer.
      */
-    getBufferContents(buffer: EditorBufferHandle): Rx.Observable<string>;
+    getBufferContents(buffer: EditorBufferHandle): Observable<string>;
 
     /**
      * Checks if the buffer has been modified.
@@ -600,7 +598,7 @@ declare namespace ZLUX {
      * @param   buffer The buffer to be checked
      * @returns        An observable that pushes whether or not the buffer has been modified
      */
-    isBufferModified(buffer: EditorBufferHandle): Rx.Observable<boolean>;
+    isBufferModified(buffer: EditorBufferHandle): Observable<boolean>;
 
     /**
      * An event that is triggered when a file is opened inside the editor.
@@ -638,7 +636,7 @@ declare namespace ZLUX {
      * @param   force   True to close the buffer even if it contains unsaved content, false to prompt the user
      * @returns       An observable that pushes when buffer is destroyed
      */
-    destroyBuffer(buffer: EditorBufferHandle, force: boolean): Rx.Observable<void>;
+    destroyBuffer(buffer: EditorBufferHandle, force: boolean): Observable<void>;
 
     /**
      * An event that is triggered when a new buffer is created.
@@ -677,14 +675,14 @@ declare namespace ZLUX {
      * @param   buffer The buffer for which the recommendations should be issued
      * @returns        An observable that pushes an array of recommended highlighting modes for the buffer
      */
-    getRecommendedHighlightingModesForBuffer(buffer: EditorBufferHandle): Rx.Observable<string[]>;
+    getRecommendedHighlightingModesForBuffer(buffer: EditorBufferHandle): Observable<string[]>;
 
     /**
      * Gets the set of supported highlighting modes for this editor.
      *
      * @returns An observable that pushes an array of supported highlighting modes
      */
-    getSupportedHighlightingModes(): Rx.Observable<string[]>;
+    getSupportedHighlightingModes(): Observable<string[]>;
   }
 
   /**
@@ -719,7 +717,7 @@ declare namespace ZLUX {
      * @param   buildParams Any parameters that should be passed to the build operation
      * @returns             An observable that returns the results of the build
      */
-    performBuild(buildParams: any): Rx.Observable<BuildResult>;
+    performBuild(buildParams: any): Observable<BuildResult>;
   }
 
   interface IEditorLanguageSupport extends IEditor {
@@ -744,7 +742,7 @@ declare namespace ZLUX {
      * @param   buffer The buffer for which to issue recommendations
      * @returns A set of recommendations for the contents of the buffer
      */
-    getRecommendedLanguagesForBuffer(buffer: EditorBufferHandle): Rx.Observable<string[]>;
+    getRecommendedLanguagesForBuffer(buffer: EditorBufferHandle): Observable<string[]>;
   }
 
   /**

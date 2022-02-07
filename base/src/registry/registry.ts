@@ -8,6 +8,9 @@
   
   Copyright Contributors to the Zowe Project.
 */
+
+import { Observable } from 'rxjs';
+
 export abstract class ComponentFactory implements ZLUX.ComponentFactory {
   private capabilities: ZLUX.Capability[];
   private componentClass: ZLUX.ComponentClass;
@@ -25,7 +28,7 @@ export abstract class ComponentFactory implements ZLUX.ComponentFactory {
     return this.componentClass;
   }
 
-  abstract instantiateIntoDOM(target: HTMLElement): ZLUX.Observable<ZLUX.IComponent>;
+  abstract instantiateIntoDOM(target: HTMLElement): Observable<ZLUX.IComponent>;
 }
 
 export class Registry implements ZLUX.Registry {
