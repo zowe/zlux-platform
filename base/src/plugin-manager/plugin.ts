@@ -43,6 +43,8 @@ export abstract class Plugin implements ZLUX.Plugin {
         return new Plugin_0(definition);
       case 1:
         return new Plugin_1(definition);
+      case 2:
+        return new Plugin_2(definition);
       default:
         throw new Error("ZWED5038E - Unrecognized plugin definition major version");
     }
@@ -164,6 +166,13 @@ class Plugin_1 extends Plugin_0 {
 
 }
 
+class Plugin_2 extends Plugin_1 {
+  constructor(definition: any) {
+    super(definition);
+  }
+
+}
+
 
 /*
   This program and the accompanying materials are
@@ -174,4 +183,3 @@ class Plugin_1 extends Plugin_0 {
   
   Copyright Contributors to the Zowe Project.
 */
-
