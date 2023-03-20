@@ -573,7 +573,7 @@ declare namespace ZLUX {
      * @param   targetBuffer The buffer into which the file should be opened, or null to open a new buffer
      * @returns              An observable that pushes a handle to the buffer into which the file was opened
      */
-    openFile(file: string, targetBuffer: EditorBufferHandle | null): Observable<EditorBufferHandle>;
+    openBuffer(file: string, targetBuffer: EditorBufferHandle | null): Observable<EditorBufferHandle>;
 
     /**
      * Save a buffer into a file.
