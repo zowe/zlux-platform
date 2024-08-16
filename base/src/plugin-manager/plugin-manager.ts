@@ -63,10 +63,31 @@ export class PluginManager {
               try {
                 var result = JSON.parse(this.responseText);
                 let allPlugins = PluginManager.parsePluginDefinitions(result);
+                const searchParams = new URLSearchParams(window.location.search);
+                const useV2Desktop = searchParams.has("use-v2-desktop") && (searchParams.get("use-v2-desktop") == '1');
+                let validPlugins = allPlugins.filter((plugin) => {
+                  if (plugin.type != 'application') {
+                    return true;
+                  } else {
+                    const webContent = plugin.getWebContent();
+                    if (webContent.framework != 'angular') {
+                      return true;
+                    } else {
+                      //exclude apps incompatible with the given desktop environment, depending upon their entryPoint content.
+                      if (useV2Desktop && (!webContent.entryPoint || webContent.entryPoint.v2)) {
+                        return true;
+                      } else if (!useV2Desktop && webContent.entryPoint && webContent.entryPoint.v3) {
+                        return true;
+                      } else {
+                        return false;
+                      }
+                    }
+                  }
+                });
                 if (!pluginType) {
-                  resolve(allPlugins);
+                  resolve(validPlugins);
                 } else {
-                  const filtered = allPlugins.filter(plugin => plugin.getType() == pluginType)
+                  const filtered = validPlugins.filter(plugin => plugin.getType() == pluginType)
                   resolve(filtered);
                 }
               } catch (error) {
