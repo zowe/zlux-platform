@@ -171,6 +171,22 @@ class Plugin_2 extends Plugin_1 {
     super(definition);
   }
 
+  getWebEntrypoint():string|undefined {
+    let entryPoints = this.webContent?.entryPoints;
+    if (entryPoints) {
+      const searchParams = new URLSearchParams(window.location.search);
+      const useV2Desktop = searchParams.has("use-v2-desktop") && (searchParams.get("use-v2-desktop") == '1');
+      if (useV2Desktop || !entryPoints['3.0']) {
+        return 'main.js';
+      } else {
+        return ''+entryPoints['3.0'];
+      }
+    } else if (this.webContent) {
+      return 'main.js';
+    }
+    return undefined;
+  }
+
 }
 
 
