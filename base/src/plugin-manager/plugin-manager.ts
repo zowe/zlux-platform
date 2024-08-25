@@ -64,7 +64,7 @@ export class PluginManager {
                 var result = JSON.parse(this.responseText);
                 let allPlugins = PluginManager.parsePluginDefinitions(result);
                 const searchParams = new URLSearchParams(window.location.search);
-                const useV2Desktop = searchParams.has("use-v2-desktop") && (searchParams.get("use-v2-desktop") == '1');
+                const useV2Desktop = searchParams.has("use-v2-desktop") && (searchParams.get("use-v2-desktop") == 'true');
                 let validPlugins = allPlugins.filter((plugin) => {
                   if (plugin.type != 'application') {
                     return true;
@@ -74,9 +74,9 @@ export class PluginManager {
                       return true;
                     } else {
                       //exclude apps incompatible with the given desktop environment, depending upon their entryPoint content.
-                      if (useV2Desktop && (!webContent.entryPoint || webContent.entryPoint.v2)) {
+                      if (useV2Desktop && (!webContent.entryPoint || webContent.entryPoint['2.0'])) {
                         return true;
-                      } else if (!useV2Desktop && webContent.entryPoint && webContent.entryPoint.v3) {
+                      } else if (!useV2Desktop && webContent.entryPoint && webContent.entryPoint['3.0']) {
                         return true;
                       } else {
                         return false;
