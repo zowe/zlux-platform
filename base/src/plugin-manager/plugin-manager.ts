@@ -70,7 +70,9 @@ export class PluginManager {
                     return true;
                   } else {
                     const webContent = plugin.getWebContent();
-                    if (webContent.framework != 'angular') {
+                    if (!webContent) {
+                      return true;
+                    } else if ((webContent.framework != 'angular') && (webContent.framework != 'angular2')) {
                       return true;
                     } else {
                       //exclude apps incompatible with the given desktop environment, depending upon their entryPoint content.
