@@ -299,6 +299,10 @@ declare namespace ZLUX {
     getBasePlugin(): any;
   }
 
+  interface PluginV2 extends Plugin {
+    getWebEntryPoint():string|undefined;
+  }
+
   interface ContainerPluginDefinition {
     getBasePlugin():Plugin;
   }
