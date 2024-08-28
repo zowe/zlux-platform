@@ -172,14 +172,14 @@ class Plugin_2 extends Plugin_1 {
   }
 
   getWebEntrypoint():string|undefined {
-    let entryPoints = this.webContent?.entryPoints;
-    if (entryPoints) {
+    let entryPoint = this.webContent?.entryPoint;
+    if (entryPoint) {
       const searchParams = new URLSearchParams(window.location.search);
-      const useV2Desktop = searchParams.has("use-v2-desktop") && (searchParams.get("use-v2-desktop") == '1');
-      if (useV2Desktop || !entryPoints['3.0']) {
+      const useV2Desktop = searchParams.has("use-v2-desktop") && (searchParams.get("use-v2-desktop") == 'true');
+      if (useV2Desktop || !entryPoint['3.0']) {
         return 'main.js';
       } else {
-        return ''+entryPoints['3.0'];
+        return ''+entryPoint['3.0'];
       }
     } else if (this.webContent) {
       return 'main.js';
