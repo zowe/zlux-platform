@@ -36,8 +36,33 @@ export class PluginManager {
         }
       });
 
-      /* Remove skipped plugins */
-      return plugins.filter(x => x) as Plugin[];
+      /* Remove skipped plugins and apps not valid for this version*/
+      let filtered =  plugins.filter(x => x) as Plugin[];
+      const searchParams = new URLSearchParams(window.location.search);
+      const useV2Desktop = searchParams.has("use-v2-desktop") && (searchParams.get("use-v2-desktop") == 'true');
+      return filtered.filter((plugin) => {
+        if (plugin.type != 'application') {
+          return true;
+        } else {
+          const webContent = plugin.webContent;
+          if (!webContent) {
+            return true;
+          } else if ((webContent.framework != 'angular') && (webContent.framework != 'angular2')) {
+            return true;
+          } else {
+            //exclude apps incompatible with the given desktop environment, depending upon their entryPoint content.
+            if (useV2Desktop && (!webContent.entryPoint || webContent.entryPoint['2.0'])) {
+              return true;
+            } else if (!useV2Desktop && webContent.entryPoint && webContent.entryPoint['3.0']) {
+              return true;
+            } else {
+              this.pluginsById.delete(plugin.identifier);
+              return false;
+            }
+          }
+        }
+      });
+
     } else {
       throw new Error("ZWED5037E - Unable to parse plugin definitions: Missing field 'pluginDefinitions'");
     }
@@ -62,11 +87,11 @@ export class PluginManager {
             case 304:
               try {
                 var result = JSON.parse(this.responseText);
-                let allPlugins = PluginManager.parsePluginDefinitions(result);
+                let validPlugins = PluginManager.parsePluginDefinitions(result);
                 if (!pluginType) {
-                  resolve(allPlugins);
+                  resolve(validPlugins);
                 } else {
-                  const filtered = allPlugins.filter(plugin => plugin.getType() == pluginType)
+                  const filtered = validPlugins.filter(plugin => plugin.getType() == pluginType)
                   resolve(filtered);
                 }
               } catch (error) {
