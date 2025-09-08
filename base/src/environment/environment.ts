@@ -29,7 +29,8 @@ type EnvironmentResponse = {
   platform: string,
   arch: string,
   userEnvironment: any,
-  agent: ZLUX.AgentConfig
+  agent: ZLUX.AgentConfig,
+  enablePasswordChange: boolean
 }
 
 export class Environment implements ZLUX.Environment {
@@ -131,6 +132,14 @@ export class Environment implements ZLUX.Environment {
     return new Promise((resolve, reject)=> {
       this._queryServer(false).then(response => resolve(new Date(response.timestamp))).catch((err)=>{reject(err);});
     });
+  }
+
+  getChangePasswordEnableFlag(): Promise<boolean> {
+      return new Promise((resolve, reject)=> {
+          this._queryServer().then(function (cache:EnvironmentResponse){
+              resolve(cache.enablePasswordChange);
+          }).catch((err)=>{reject(err);});
+      });
   }
 
   private _queryServer(useCache:boolean=true):Promise<EnvironmentResponse> {

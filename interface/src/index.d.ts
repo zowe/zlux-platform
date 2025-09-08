@@ -183,6 +183,7 @@ declare namespace ZLUX {
     getArch(): Promise<string>;
     //should poll server
     getTime(): Promise<Date>;
+    getChangePasswordEnableFlag(): Promise<boolean>;
   }
 
   
