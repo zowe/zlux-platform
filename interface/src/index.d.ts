@@ -181,9 +181,9 @@ declare namespace ZLUX {
     getPlatform(): Promise<string>;
     getAgentConfig(): Promise<AgentConfig|undefined>;
     getArch(): Promise<string>;
+    getChangePasswordEnableFlag(): Promise<boolean>;
     //should poll server
     getTime(): Promise<Date>;
-    getChangePasswordEnableFlag(): Promise<boolean>;
   }
 
   
