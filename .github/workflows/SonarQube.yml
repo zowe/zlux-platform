@@ -45,7 +45,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=zowe_zlux-editor
+            -Dsonar.projectKey=zowe_zlux-platform
             -Dsonar.organization=zowe
             -Dsonar.sources=./
             -Dsonar.tests=./
