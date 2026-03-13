@@ -142,6 +142,21 @@ export class Environment implements ZLUX.Environment {
     });
   }
 
+  getZoweVersion(): Promise<string | undefined> {
+    return new Promise((resolve, reject) => {
+      this._queryServer().then(function (cache: any) {
+        // Try to get zoweVersion from the top-level or userEnvironment
+        if (cache.zoweVersion) {
+          resolve(cache.zoweVersion);
+        } else if (cache.userEnvironment && cache.userEnvironment.zoweVersion) {
+          resolve(cache.userEnvironment.zoweVersion);
+        } else {
+          resolve(undefined);
+        }
+      }).catch((err) => { reject(err); });
+    });
+  }
+
   private _queryServer(useCache:boolean=true):Promise<EnvironmentResponse> {
     return new Promise((resolve, reject)=> {
       if (useCache && this._cache) {
