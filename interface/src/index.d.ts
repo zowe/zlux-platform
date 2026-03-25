@@ -182,7 +182,6 @@ declare namespace ZLUX {
     getAgentConfig(): Promise<AgentConfig|undefined>;
     getArch(): Promise<string>;
     getChangePasswordEnableFlag(): Promise<boolean>;
-    getZoweVersion(): Promise<string | undefined>;
     //should poll server
     getTime(): Promise<Date>;
   }
@@ -207,6 +206,15 @@ declare namespace ZLUX {
     getLocale(): string;
     setLanguage(language: string): any;
     setLocale(locale: string): any;
+  }
+
+  /**
+     Provides access to server metadata that does not require authentication.
+     Unlike Environment, these endpoints are available before login.
+     @interface
+   */
+  interface ServerMetadata {
+    getZoweVersion(): Promise<string | undefined>;
   }
 
   type UnixFileUriOptions = {
@@ -826,6 +834,7 @@ declare class ZoweZLUXResources {
   static uriBroker: ZLUX.UriBroker;
   static dispatcher: ZLUX.Dispatcher;
   static environment: ZLUX.Environment;
+  static serverMetadata: ZLUX.ServerMetadata;
   static logger: ZLUX.Logger;
   static registry: ZLUX.Registry;
   //previously was NotificationManager
