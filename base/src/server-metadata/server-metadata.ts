@@ -17,27 +17,27 @@ export class ServerMetadata implements ZLUX.ServerMetadata {
   private zoweVersion: string | undefined;
 
   getZoweVersion(): Promise<string | undefined> {
+    if (this.zoweVersion !== undefined) {
+      return Promise.resolve(this.zoweVersion);
+    }
     return new Promise((resolve, reject) => {
-      if (this.zoweVersion !== undefined) {
-        return resolve(this.zoweVersion);
-      }
-      var request = new XMLHttpRequest();
+      const request = new XMLHttpRequest();
       request.onreadystatechange = () => {
-        if (request.readyState == 4) {
+        if (request.readyState === 4) {
           switch (request.status) {
-          case 200:
-          case 304:
-            try {
-              const result = JSON.parse(request.responseText);
-              this.zoweVersion = result.zoweVersion;
-              resolve(this.zoweVersion);
-            } catch (error) {
-              reject(error);
-            }
-            break;
-          default:
-            reject({responseText: request.responseText, status: request.status});
-            break;
+            case 200:
+            case 304:
+              try {
+                const result = JSON.parse(request.responseText);
+                this.zoweVersion = result.zoweVersion;
+                resolve(this.zoweVersion);
+              } catch (error) {
+                reject(error);
+              }
+              break;
+            default:
+              reject({responseText: request.responseText, status: request.status});
+              break;
           }
         }
       };

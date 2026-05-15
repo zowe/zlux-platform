@@ -142,7 +142,6 @@ export class Environment implements ZLUX.Environment {
     });
   }
 
-
   private _queryServer(useCache:boolean=true):Promise<EnvironmentResponse> {
     return new Promise((resolve, reject)=> {
       if (useCache && this._cache) {

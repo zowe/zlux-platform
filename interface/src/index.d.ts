@@ -209,9 +209,8 @@ declare namespace ZLUX {
   }
 
   /**
-     Provides access to server metadata that does not require authentication.
-     Unlike Environment, these endpoints are available before login.
-     @interface
+   * Provides access to server metadata that does not require authentication.
+   * Unlike Environment, these endpoints are available before login.
    */
   interface ServerMetadata {
     getZoweVersion(): Promise<string | undefined>;
