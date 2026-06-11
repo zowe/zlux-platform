@@ -117,6 +117,8 @@ class Plugin_0 extends Plugin {
       } else {
         this._hasComponents = false;
       }
+    } else {
+      this._hasComponents = false;
     }
     
     if (typeof definition.copyright === "string") {

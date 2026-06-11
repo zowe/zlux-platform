@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "ts-mocha -p ./base/tsconfig.test.json ./base/**/*.spec.ts"
+    "test": "ts-mocha -p ./base/tsconfig.test.json --require ./base/test-setup.ts ./base/**/*.spec.ts"
   },
   "keywords": [],
   "author": "",
