@@ -10,7 +10,7 @@
 
 // Provide ZLUX namespace globals that const enums reference at runtime
 // when compiled with ts-node's transpileModule mode.
-(global as any).ZLUX = {
+global.ZLUX = {
   PluginType: {
     Desktop: "desktop",
     Application: "application",

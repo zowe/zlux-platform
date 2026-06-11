@@ -5,8 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "ts-mocha -p ./base/tsconfig.test.json --require ./base/test-setup.ts ./base/**/*.spec.ts",
-    "test:coverage": "c8 --reporter=lcov --reporter=text ts-mocha -p ./base/tsconfig.test.json --require ./base/test-setup.ts ./base/**/*.spec.ts"
+    "test": "mocha --require ./test/test-setup.js --require ts-node/register ./test/**/*.js",
+    "test:coverage": "c8 --reporter=lcov --reporter=text mocha --require ./test/test-setup.js --require ts-node/register ./test/**/*.js"
   },
   "keywords": [],
   "author": "",
@@ -19,7 +19,7 @@
     "chai": "4.2.0",
     "mocha": "10.2.0",
     "rxjs": "6.6.7",
-    "ts-mocha": "10.0.0",
+    "ts-node": "10.9.2",
     "typescript": "4.2.4"
   }
 }

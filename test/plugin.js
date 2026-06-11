@@ -8,12 +8,12 @@
   Copyright Contributors to the Zowe Project.
 */
 
-import { Plugin } from './plugin';
-import { expect } from 'chai';
+const { Plugin } = require('../base/src/plugin-manager/plugin');
+const { expect } = require('chai');
 
-describe('Plugin', () => {
-  describe('parsePluginDefinition', () => {
-    it('should parse a valid apiVersion 0 plugin', () => {
+describe('Plugin', function () {
+  describe('parsePluginDefinition', function () {
+    it('should parse a valid apiVersion 0 plugin', function () {
       const definition = {
         apiVersion: '0.1.0',
         identifier: 'org.zowe.testplugin',
@@ -25,7 +25,7 @@ describe('Plugin', () => {
       expect(plugin.version).to.equal('1.0.0');
     });
 
-    it('should parse a valid apiVersion 1 plugin', () => {
+    it('should parse a valid apiVersion 1 plugin', function () {
       const definition = {
         apiVersion: '1.0.0',
         identifier: 'org.zowe.v1plugin',
@@ -37,7 +37,7 @@ describe('Plugin', () => {
       expect(plugin.version).to.equal('2.3.4');
     });
 
-    it('should parse a valid apiVersion 2 plugin', () => {
+    it('should parse a valid apiVersion 2 plugin', function () {
       const definition = {
         apiVersion: '2.0.0',
         identifier: 'org.zowe.v2plugin',
@@ -48,71 +48,71 @@ describe('Plugin', () => {
       expect(plugin.identifier).to.equal('org.zowe.v2plugin');
     });
 
-    it('should throw for unrecognized apiVersion major', () => {
+    it('should throw for unrecognized apiVersion major', function () {
       const definition = {
         apiVersion: '99.0.0',
         identifier: 'org.zowe.future',
         pluginVersion: '1.0.0',
         pluginType: 'application'
       };
-      expect(() => Plugin.parsePluginDefinition(definition)).to.throw('ZWED5038E');
+      expect(function () { Plugin.parsePluginDefinition(definition); }).to.throw('ZWED5038E');
     });
 
-    it('should throw for invalid apiVersion string', () => {
+    it('should throw for invalid apiVersion string', function () {
       const definition = {
         apiVersion: 'invalid',
         identifier: 'org.zowe.bad',
         pluginVersion: '1.0.0',
         pluginType: 'application'
       };
-      expect(() => Plugin.parsePluginDefinition(definition)).to.throw('ZWED5043E');
+      expect(function () { Plugin.parsePluginDefinition(definition); }).to.throw('ZWED5043E');
     });
 
-    it('should throw when identifier is not a string', () => {
+    it('should throw when identifier is not a string', function () {
       const definition = {
         apiVersion: '1.0.0',
         identifier: 123,
         pluginVersion: '1.0.0',
         pluginType: 'application'
       };
-      expect(() => Plugin.parsePluginDefinition(definition)).to.throw('ZWED5039E');
+      expect(function () { Plugin.parsePluginDefinition(definition); }).to.throw('ZWED5039E');
     });
 
-    it('should throw when pluginVersion is not a string', () => {
+    it('should throw when pluginVersion is not a string', function () {
       const definition = {
         apiVersion: '1.0.0',
         identifier: 'org.zowe.test',
         pluginVersion: 123,
         pluginType: 'application'
       };
-      expect(() => Plugin.parsePluginDefinition(definition)).to.throw('ZWED5040E');
+      expect(function () { Plugin.parsePluginDefinition(definition); }).to.throw('ZWED5040E');
     });
 
-    it('should throw when pluginType is invalid', () => {
+    it('should throw when pluginType is invalid', function () {
       const definition = {
         apiVersion: '1.0.0',
         identifier: 'org.zowe.test',
         pluginVersion: '1.0.0',
         pluginType: 'invalidType'
       };
-      expect(() => Plugin.parsePluginDefinition(definition)).to.throw('ZWED5041E');
+      expect(function () { Plugin.parsePluginDefinition(definition); }).to.throw('ZWED5041E');
     });
 
-    it('should throw when pluginType is not a string', () => {
+    it('should throw when pluginType is not a string', function () {
       const definition = {
         apiVersion: '1.0.0',
         identifier: 'org.zowe.test',
         pluginVersion: '1.0.0',
         pluginType: 123
       };
-      expect(() => Plugin.parsePluginDefinition(definition)).to.throw('ZWED5042E');
+      expect(function () { Plugin.parsePluginDefinition(definition); }).to.throw('ZWED5042E');
     });
   });
 
-  describe('Plugin instance methods', () => {
-    let plugin: any;
+  describe('Plugin instance methods', function () {
+    let plugin;
 
-    before(() => {
+    before(function () {
       plugin = Plugin.parsePluginDefinition({
         apiVersion: '1.0.0',
         identifier: 'org.zowe.methods',
@@ -123,41 +123,41 @@ describe('Plugin', () => {
       });
     });
 
-    it('getIdentifier should return identifier', () => {
+    it('getIdentifier should return identifier', function () {
       expect(plugin.getIdentifier()).to.equal('org.zowe.methods');
     });
 
-    it('getVersion should return version', () => {
+    it('getVersion should return version', function () {
       expect(plugin.getVersion()).to.equal('3.2.1');
     });
 
-    it('getKey should return identifier@version', () => {
+    it('getKey should return identifier@version', function () {
       expect(plugin.getKey()).to.equal('org.zowe.methods@3.2.1');
     });
 
-    it('getWebContent should return webContent', () => {
+    it('getWebContent should return webContent', function () {
       expect(plugin.getWebContent()).to.deep.include({ hasComponents: true });
     });
 
-    it('getCopyright should return copyright', () => {
+    it('getCopyright should return copyright', function () {
       expect(plugin.getCopyright()).to.equal('(c) Zowe');
     });
 
-    it('hasComponents should return true when webContent has it', () => {
+    it('hasComponents should return true when webContent has it', function () {
       expect(plugin.hasComponents()).to.be.true;
     });
 
-    it('toString should include key', () => {
+    it('toString should include key', function () {
       expect(plugin.toString()).to.include('org.zowe.methods@3.2.1');
     });
 
-    it('getBasePlugin should return definition', () => {
+    it('getBasePlugin should return definition', function () {
       expect(plugin.getBasePlugin()).to.have.property('identifier', 'org.zowe.methods');
     });
   });
 
-  describe('Plugin without webContent', () => {
-    it('should handle missing webContent', () => {
+  describe('Plugin without webContent', function () {
+    it('should handle missing webContent', function () {
       const plugin = Plugin.parsePluginDefinition({
         apiVersion: '1.0.0',
         identifier: 'org.zowe.noweb',
@@ -168,14 +168,14 @@ describe('Plugin', () => {
     });
   });
 
-  describe('Plugin types', () => {
+  describe('Plugin types', function () {
     const types = ['desktop', 'application', 'bootstrap', 'library', 'nodeAuthentication'];
 
-    types.forEach(type => {
-      it(`should parse pluginType "${type}"`, () => {
+    types.forEach(function (type) {
+      it('should parse pluginType "' + type + '"', function () {
         const plugin = Plugin.parsePluginDefinition({
           apiVersion: '1.0.0',
-          identifier: `org.zowe.${type}`,
+          identifier: 'org.zowe.' + type,
           pluginVersion: '1.0.0',
           pluginType: type
         });
