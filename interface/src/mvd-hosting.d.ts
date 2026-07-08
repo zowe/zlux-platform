@@ -19,7 +19,8 @@ declare namespace MVDHosting {
     ViewportManagerToken = "com.rs.mvd.hosting.viewport-manager",
     PluginManagerToken = "com.rs.mvd.hosting.plugin-manager",
     AuthenticationManagerToken = "com.rs.mvd.hosting.authentication-manager",
-    ThemeEmitterToken = "com.rs.mvd.hosting.theme-emitter"
+    ThemeEmitterToken = "com.rs.mvd.hosting.theme-emitter",
+    SpotlightSearchToken = "com.rs.mvd.hosting.spotlight-search"
   }
 
   export const enum ZoweNotificationType {
@@ -120,6 +121,30 @@ declare namespace MVDHosting {
   export interface ZoweNotificationWatcher {
     handleMessageAdded(test: any): void;
     handleMessageRemoved(id: number): void;
+  }
+
+  export interface SpotlightSearchInterface {
+    registerProvider(provider: SpotlightProviderInterface): void;
+    unregisterProvider(id: string): void;
+    getProvider(id: string): SpotlightProviderInterface | undefined;
+    getProviderForCategory(category: string): SpotlightProviderInterface | undefined;
+    getProviders(): SpotlightProviderInterface[];
+    getCategoryIcon(category: string): string;
+    getCategoryOrder(): string[];
+  }
+
+  export interface SpotlightProviderInterface {
+    id: string;
+    category: string;
+    icon: string;
+    prefixes: string[];
+    order: number;
+    canSearch(query: string): boolean;
+    search(query: string): Observable<any>;
+    getHistory?(): any[];
+    clearHistory?(): void;
+    removeHistoryItem?(cmd: string): void;
+    suppressNoResults?: boolean;
   }
 }
 
