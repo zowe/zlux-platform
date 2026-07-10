@@ -20,7 +20,7 @@ declare namespace MVDHosting {
     PluginManagerToken = "com.rs.mvd.hosting.plugin-manager",
     AuthenticationManagerToken = "com.rs.mvd.hosting.authentication-manager",
     ThemeEmitterToken = "com.rs.mvd.hosting.theme-emitter",
-    SpotlightSearchToken = "com.rs.mvd.hosting.spotlight-search"
+    QuickSearchToken = "com.rs.mvd.hosting.quick-search"
   }
 
   export const enum ZoweNotificationType {
@@ -123,17 +123,17 @@ declare namespace MVDHosting {
     handleMessageRemoved(id: number): void;
   }
 
-  export interface SpotlightSearchInterface {
-    registerProvider(provider: SpotlightProviderInterface): void;
+  export interface QuickSearchInterface {
+    registerProvider(provider: QuickSearchProviderInterface): void;
     unregisterProvider(id: string): void;
-    getProvider(id: string): SpotlightProviderInterface | undefined;
-    getProviderForCategory(category: string): SpotlightProviderInterface | undefined;
-    getProviders(): SpotlightProviderInterface[];
+    getProvider(id: string): QuickSearchProviderInterface | undefined;
+    getProviderForCategory(category: string): QuickSearchProviderInterface | undefined;
+    getProviders(): QuickSearchProviderInterface[];
     getCategoryIcon(category: string): string;
     getCategoryOrder(): string[];
   }
 
-  export interface SpotlightProviderInterface {
+  export interface QuickSearchProviderInterface {
     id: string;
     category: string;
     icon: string;
