@@ -123,6 +123,27 @@ declare namespace MVDHosting {
     handleMessageRemoved(id: number): void;
   }
 
+  export interface QuickSearchResultInterface {
+    category: string;
+    label: string;
+    description?: string;
+    icon?: string;
+    output?: string;
+    pendingExecution?: boolean;
+    historyItem?: boolean;
+    historyCommand?: string;
+    action: () => void;
+    actionMetadata?: {
+      type: string;
+      targetPluginId?: string;
+      data?: any;
+      path?: string;
+      text?: string;
+    };
+    execute?: () => Observable<QuickSearchResultInterface[]>;
+    providerId?: string;
+  }
+
   export interface QuickSearchInterface {
     registerProvider(provider: QuickSearchProviderInterface): void;
     unregisterProvider(id: string): void;
@@ -131,6 +152,11 @@ declare namespace MVDHosting {
     getProviders(): QuickSearchProviderInterface[];
     getCategoryIcon(category: string): string;
     getCategoryOrder(): string[];
+    isBareCommandPrefix(query: string): boolean;
+    search(query: string): Observable<QuickSearchResultInterface[]>;
+    setVisible(visible: boolean): void;
+    isVisible(): boolean;
+    removeHistoryItem(category: string, cmd: string): void;
   }
 
   export interface QuickSearchProviderInterface {
@@ -140,8 +166,8 @@ declare namespace MVDHosting {
     prefixes: string[];
     order: number;
     canSearch(query: string): boolean;
-    search(query: string): Observable<any>;
-    getHistory?(): any[];
+    search(query: string): Observable<QuickSearchResultInterface[]>;
+    getHistory?(): QuickSearchResultInterface[];
     clearHistory?(): void;
     removeHistoryItem?(cmd: string): void;
     suppressNoResults?: boolean;
