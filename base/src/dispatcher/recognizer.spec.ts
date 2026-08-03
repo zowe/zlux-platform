@@ -19,7 +19,7 @@ describe('Recognizer', () => {
       addEventListener: () => { },
       setTimeout: () => 1
     };
-    global.window = <any>mockWindow;
+    global.window = mockWindow as any;
   });
 
   describe('Recognizer Properties', () => {
