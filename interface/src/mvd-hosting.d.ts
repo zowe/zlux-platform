@@ -19,7 +19,8 @@ declare namespace MVDHosting {
     ViewportManagerToken = "com.rs.mvd.hosting.viewport-manager",
     PluginManagerToken = "com.rs.mvd.hosting.plugin-manager",
     AuthenticationManagerToken = "com.rs.mvd.hosting.authentication-manager",
-    ThemeEmitterToken = "com.rs.mvd.hosting.theme-emitter"
+    ThemeEmitterToken = "com.rs.mvd.hosting.theme-emitter",
+    QuickSearchToken = "com.rs.mvd.hosting.quick-search"
   }
 
   export const enum ZoweNotificationType {
@@ -120,6 +121,56 @@ declare namespace MVDHosting {
   export interface ZoweNotificationWatcher {
     handleMessageAdded(test: any): void;
     handleMessageRemoved(id: number): void;
+  }
+
+  export interface QuickSearchResultInterface {
+    category: string;
+    label: string;
+    description?: string;
+    icon?: string;
+    output?: string;
+    pendingExecution?: boolean;
+    historyItem?: boolean;
+    historyCommand?: string;
+    action: () => void;
+    actionMetadata?: {
+      type: string;
+      targetPluginId?: string;
+      data?: any;
+      path?: string;
+      text?: string;
+    };
+    execute?: () => Observable<QuickSearchResultInterface[]>;
+    providerId?: string;
+  }
+
+  export interface QuickSearchInterface {
+    registerProvider(provider: QuickSearchProviderInterface): void;
+    unregisterProvider(id: string): void;
+    getProvider(id: string): QuickSearchProviderInterface | undefined;
+    getProviderForCategory(category: string): QuickSearchProviderInterface | undefined;
+    getProviders(): QuickSearchProviderInterface[];
+    getCategoryIcon(category: string): string;
+    getCategoryOrder(): string[];
+    isBareCommandPrefix(query: string): boolean;
+    search(query: string): Observable<QuickSearchResultInterface[]>;
+    setVisible(visible: boolean): void;
+    isVisible(): boolean;
+    removeHistoryItem(category: string, cmd: string): void;
+  }
+
+  export interface QuickSearchProviderInterface {
+    id: string;
+    category: string;
+    icon: string;
+    prefixes: string[];
+    order: number;
+    canSearch(query: string): boolean;
+    search(query: string): Observable<QuickSearchResultInterface[]>;
+    getHistory?(): QuickSearchResultInterface[];
+    clearHistory?(): void;
+    removeHistoryItem?(cmd: string): void;
+    suppressNoResults?: boolean;
   }
 }
 
