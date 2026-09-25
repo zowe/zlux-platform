@@ -991,6 +991,10 @@ export class Dispatcher implements ZLUX.Dispatcher {
       var returnListener: EventListenerOrEventListenerObject;
       new Promise((resolve) => {
         returnListener = (evt: MessageEvent) => {
+          if (evt.origin !== window.location.origin) {
+            this.log.warn("ZWED5044W", evt.origin); //this.log.warn(`Ignoring window message from untrusted origin ${evt.origin}`);
+            return;
+          }
           if (evt.data.messageType === "return" && evt.data.arguments.appId.toString() === instanceId){
             resolve(evt.data.arguments.returnValue)
           }
@@ -1006,6 +1010,10 @@ export class Dispatcher implements ZLUX.Dispatcher {
   }
 
   iframeMessageHandler = (evt: any) => {
+    if (evt.origin !== window.location.origin) {
+      this.log.warn("ZWED5019W", evt.origin); //this.log.warn(`Ignoring window message from untrusted origin ${evt.origin}`);
+      return;
+    }
     if (evt.data.messageType && evt.data.arguments) {
       let args = evt.data.arguments;
       switch (evt.data.messageType) {
