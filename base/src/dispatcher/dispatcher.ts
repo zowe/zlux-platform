@@ -992,6 +992,7 @@ export class Dispatcher implements ZLUX.Dispatcher {
       new Promise((resolve) => {
         returnListener = (evt: MessageEvent) => {
           if (evt.origin !== window.location.origin) {
+            this.log.warn("ZWED5044W", evt.origin); //this.log.warn(`Ignoring window message from untrusted origin ${evt.origin}`);
             return;
           }
           if (evt.data.messageType === "return" && evt.data.arguments.appId.toString() === instanceId){
