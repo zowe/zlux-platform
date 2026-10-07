@@ -19,7 +19,7 @@ describe('Recognizer', () => {
       addEventListener: () => { },
       setTimeout: () => 1
     };
-    global.window = <any>mockWindow;
+    global.window = mockWindow as any;
   });
 
   describe('Recognizer Properties', () => {
@@ -166,11 +166,11 @@ describe('Recognizer', () => {
     const nop = () => { };
 
     beforeEach(() => {
-      const mockupLogger = <ZLUX.ComponentLogger>{
+      const mockupLogger = {
         debug: nop,
         warn: nop,
         info: nop,
-      };
+      } as ZLUX.ComponentLogger;
       dispatcher = new Dispatcher(mockupLogger);
 
       const actionTitle = 'test action';

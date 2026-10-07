@@ -134,6 +134,14 @@ export class Environment implements ZLUX.Environment {
     });
   }
 
+  getAgentHost(): Promise<string|undefined> {
+    return new Promise((resolve, reject)=> {
+      this._queryServer().then(function (cache:EnvironmentResponse){
+        resolve(cache.agent?.host);
+      }).catch((err)=>{reject(err);});
+    });
+  }
+
   getChangePasswordEnableFlag(): Promise<boolean> {
     return new Promise((resolve, reject)=> {
       this._queryServer().then(function (cache:EnvironmentResponse){

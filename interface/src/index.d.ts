@@ -168,6 +168,7 @@ declare namespace ZLUX {
   }
 
   interface AgentConfig {
+    host?: string;
     mediationLayer?: AgentAPIMLConfig;
   }
 
@@ -178,6 +179,7 @@ declare namespace ZLUX {
     getExternalComponents(): Promise<string[]|undefined>;
     getGatewayPort(): Promise<number|undefined>;
     getGatewayHost(): Promise<string|undefined>;
+    getAgentHost(): Promise<string|undefined>;
     getPlatform(): Promise<string>;
     getAgentConfig(): Promise<AgentConfig|undefined>;
     getArch(): Promise<string>;
